@@ -1,4 +1,4 @@
-# 31 May 20:
+﻿# 31 May 20:
 """
 mainui button √
 read the mouse and keyboard events √
@@ -16,6 +16,8 @@ import cv2
 import pynput
 from EventRecord import EventRecord
 import script
+import imp
+
 
 
 #testing functionality of screenshot searchImageFromScreenshot
@@ -77,7 +79,8 @@ class MainWindow(QtWidgets.QMainWindow):
   def runButtonPressed(self):
     log.debug("runButtonPressed clicked")
     script.main() # creating script_csv.py fille
-    import script_csv
+    import importlib
+    importlib.reload(script_csv)
     script_csv.main() #calling script_csv fille
 
 if __name__ == '__main__':
