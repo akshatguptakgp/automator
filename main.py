@@ -16,37 +16,7 @@ import cv2
 import pynput
 from EventRecord import EventRecord
 import script
-import imp
-
-
-
-#testing functionality of screenshot searchImageFromScreenshot
-#import pyautogui as auto
-#template = cv2.imread("template.jpg",0)
-#cordx,cordy = searchImageFromScreenshot(template)
-#auto.moveTo(cordx,cordy,duration=5)
-
-#testing functionality of taking snip from cursor location
-##%%
-#import pyautogui as auto
-#import win32api
-#import time
-#from utils import takeSnapshot
-##%%
-#count=0
-#pixel_size = 100
-#state_left = win32api.GetKeyState(0x01)
-#while True:
-#    a = win32api.GetKeyState(0x01)
-#    if a!=state_left: #button changed
-#        state_left = a
-#        if a<0:
-#            takeSnapshot(pixel_size)
-#            print('mouse event')
-#    time.sleep(0.001)
-#    #%%
-#
-
+import importlib
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-log", "--log", default="info",help=("Provide logging level. "    "Example --log debug', default='warning'"),)
@@ -79,7 +49,8 @@ class MainWindow(QtWidgets.QMainWindow):
   def runButtonPressed(self):
     log.debug("runButtonPressed clicked")
     script.main() # creating script_csv.py fille
-    import importlib
+    
+    import script_csv
     importlib.reload(script_csv)
     script_csv.main() #calling script_csv fille
 
