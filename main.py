@@ -16,7 +16,7 @@ import cv2
 import pynput
 from EventRecord import EventRecord
 import script
-import script_csv
+
 
 #testing functionality of screenshot searchImageFromScreenshot
 #import pyautogui as auto
@@ -77,6 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
   def runButtonPressed(self):
     log.debug("runButtonPressed clicked")
     script.main() # creating script_csv.py fille
+    import script_csv
     script_csv.main() #calling script_csv fille
 
 if __name__ == '__main__':

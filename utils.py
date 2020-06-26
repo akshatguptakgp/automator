@@ -7,7 +7,6 @@ import numpy as np
 import pyautogui as auto
 import pynput
 import pandas as pd
-from Parameters import Parameters
 
 def setupLogger(parser):
     options = parser.parse_args()

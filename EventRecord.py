@@ -10,7 +10,6 @@ from pynput import mouse
 from pynput import keyboard
 import time
 import pandas as pd
-from utils import takeSnapshot
 import cv2
 import os
 import keyboard
