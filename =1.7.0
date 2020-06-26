@@ -1,0 +1,10 @@
+Collecting onnxconverter-common
+  Downloading onnxconverter_common-1.6.1-py2.py3-none-any.whl (45 kB)
+Requirement already satisfied: protobuf in /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages (from onnxconverter-common) (3.7.0)
+Requirement already satisfied: six in /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages (from onnxconverter-common) (1.12.0)
+Requirement already satisfied: onnx in /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages (from onnxconverter-common) (1.7.0)
+Requirement already satisfied: numpy in /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages (from onnxconverter-common) (1.18.1)
+Requirement already satisfied: setuptools in /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages (from protobuf->onnxconverter-common) (41.0.1)
+Requirement already satisfied: typing-extensions>=3.6.2.1 in /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages (from onnx->onnxconverter-common) (3.7.4.2)
+Installing collected packages: onnxconverter-common
+Successfully installed onnxconverter-common-1.6.1
