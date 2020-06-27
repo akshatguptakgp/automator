@@ -5,7 +5,7 @@ Created on Sun Jun  7 23:13:46 2020
 
 @author: sumityadav
 """
-import pyautogui
+import pyautogui as auto
 from pynput import mouse
 from pynput import keyboard
 import time
@@ -13,6 +13,7 @@ import pandas as pd
 import cv2
 import os
 import keyboard
+import utils
 
 def sum(x,y):
     return x+y
@@ -37,11 +38,11 @@ class EventRecord:
         self.df = pd.DataFrame()
         self.start_time = time.time()
         # Collect events until released
-        self.listener_mouse = mouse.Listener(on_move=self.on_move,on_click=self.on_click,on_scroll=self.on_scroll)
+        self.listener_mouse = mouse.Listener(on_move=self.on_move,on_click=self.on_click,on_scroll=self.on_scroll, suppress=True)
         self.listener_mouse.start()
         self.ui = ui
         self.LEFT_KEY_PRESSED_FLAG = False
-        self.SCREEN_WIDTH,self.SCREEN_HEIGHT = pyautogui.size()
+        self.SCREEN_WIDTH,self.SCREEN_HEIGHT = auto.size()
 
         keyboard.start_recording() # Don't put anythiing below this line
 
@@ -70,11 +71,12 @@ class EventRecord:
         #     (x, y)))
 
         if x==0 and y==0:
+            self.listener_mouse.stop()
             rk = keyboard.stop_recording()
             self.save_keyboard_events_to_df(rk)
+            print(self.df)
             self.df = self.df.sort_values(by=["time"])
             self.df.to_csv("commands.csv")
-            self.listener_mouse.stop()
             print("STOPPED THE PROCESS")
             print("SUCCESSFULLY")
 
@@ -88,6 +90,7 @@ class EventRecord:
             # self.ui.recordingButton.repaint()
 
     def on_click(self, x, y, button, pressed):
+        utils.takeSnapshotAroundCursor(200,"saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png")
         # print(button)
         print('{0} at {1}'.format(
             'Pressed' if pressed else 'Released',
@@ -102,10 +105,18 @@ class EventRecord:
                 self.LEFT_KEY_PRESSED_FLAG=False
 
         self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": time.time()-self.start_time, "pressed": 'pressed' if pressed else 'released'}, ignore_index=True)
-        # snip  = takeSnapshot(200)
-        # print(snip.shape)
-        # cv2.imwrite(os.path.join(os.getcwd(), "saved_snips_for_cliks",str(x) + "_" + str(y)+ ".jpg"),snip)
         print(self.df)
+
+        #-- Event unsupress
+        print("#-- Event unsupress \n ")
+        button_name = str(button).split('.')[1]
+        SCREEN_WIDTH,SCREEN_HEIGHT = auto.size()
+        if pressed:
+            auto.mouseDown(button=button_name, x=x*SCREEN_WIDTH, y=y*SCREEN_HEIGHT, duration = 0)
+            print("Event unsupress pressed")
+        else:
+            auto.mouseUp(button=button_name, x=x*SCREEN_WIDTH, y=y*SCREEN_HEIGHT, duration = 0)
+            print("Event unsupress released")
 
     def on_scroll(self,x, y, dx, dy):
         x = x/self.SCREEN_WIDTH

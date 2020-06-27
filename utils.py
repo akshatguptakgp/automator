@@ -89,58 +89,31 @@ def checkIfPointInside(point,bbox):
 #     # im = auto.screenshot(imageFilename="screenshot.png", region=(x,y,pixel_size,pixel_size))
 #     return None
 
-def takeSnapshotAroundCursor(pixel_size, SAVE_PATH=None):
+def takeSnapshotAroundCursor(pixel_size, SAVE_PATH):
     """
     returns the image of pixel_size*pixel_size  surrounding the cursor
     """
     half_length = int(pixel_size/2)
-    # w = auto.position()[0]
-    # h = auto.position()[1]
-
-    # screenshot = np.array(ImageGrab.grab().convert('RGB'))
-    screenshot = np.array(auto.screenshot())
-
-    # screenshot_h,screenshot_w = Parameters().screenshot_size
-    screenshot_h,screenshot_w,_ = screenshot.shape
+    screenshot_h,screenshot_w,_ = Parameters().screenshot_size
     mouse_screen_w,mouse_screen_h = auto.size()
-
     mouse = Controller()
-    w,h = mouse.position
-    w = w*screenshot_w/mouse_screen_w
-    h = h*screenshot_h/mouse_screen_h
-
-    w,h = (int(w),int(h))
-    print(w,h)
-
+    w,h = mouse.position #  position of mouse
+    w = int(w*screenshot_w/mouse_screen_w)
+    h = int(h*screenshot_h/mouse_screen_h)
     heightup = h-half_length
     heightdown = h+half_length
     wleft = w-half_length
     wright = w+half_length
-
-
-    print(screenshot.shape)
-
-    print(heightup,heightdown,wleft,wright)
-    screenh,screenw = screenshot.shape[:-1]
     if(heightup<0):
         heightup=0
-    if(heightdown>screenshot.shape[0]):
-        heightdown = screenshot.shape[0]
+    if(heightdown>screenshot_h):
+        heightdown = screenshot_h
 
     if(wleft<0):
         wleft=0
-    if(wright>screenshot.shape[1]):
-        wright = screenshot.shape[1]
-
-    # snip = screenshot[heightup:heightdown,wleft:wright]
-    print(heightup,heightdown,wleft,wright)
-    print(wleft,heightup,wright-wleft,heightdown-heightup)
+    if(wright>screenshot_w):
+        wright = screenshot_w
     auto.screenshot(imageFilename=SAVE_PATH, region=(wleft,heightup,wright-wleft,heightdown-heightup))
-
-    # print(heightup,heightdown,wleft,wright)
-    # if SAVE_PATH is not None:
-    #     cv2.imwrite("ss_" + SAVE_PATH, screenshot)
-    #     cv2.imwrite(SAVE_PATH,snip)
     return None
 
 def getActiveWindow(sleep_time=0):

@@ -40,7 +40,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # toggling start and stop buttons
     if self.ui.recordingButton.text() == "Start":
-#        os.system("rm saved_snips_for_cliks/*")
+        os.system("mkdir saved_snips_for_cliks")
+        os.system("rm saved_snips_for_cliks/*")
         self.ui.recordingButton.setText("Stop")
         self.ui.recordingButton.repaint()
         eventRecord = EventRecord(self.ui)
@@ -52,11 +53,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
   def runButtonPressed(self):
     log.debug("runButtonPressed clicked")
-    # script.main() # creating script_csv.py fille
-    # import script_csv
-    # importlib.reload(script_csv)
-    # script_csv.main() #calling script_csv fille
-    utils.takeSnapshotAroundCursor(200,"screenshot.jpg")
+    script.main() # creating script_csv.py fille
+    import script_csv
+    importlib.reload(script_csv)
+    script_csv.main() #calling script_csv fille
+
 
 if __name__ == '__main__':
   app = QtWidgets.QApplication(sys.argv)
