@@ -7,6 +7,8 @@ import numpy as np
 import pyautogui as auto
 import pynput
 import pandas as pd
+from Parameters import Parameters
+from pynput.mouse import Button, Controller
 
 def setupLogger(parser):
     options = parser.parse_args()
@@ -50,43 +52,96 @@ def checkIfPointInside(point,bbox):
         return True
     return False
 
+# def takeSnapshotAroundCursor(pixel_size, SAVE_PATH=None):
+#     """
+#     pixel_size: screenshot size: pixel_size*pixel_size
+#     SAVE_PATH:(optional) where to save image
+#     returns the image of pixel_size*pixel_size  surrounding the cursor
+#     """
+#     x = auto.position()[0]
+#     y = auto.position()[1]
+#     x1 = x-int(pixel_size/2)
+#     y1 = y-int(pixel_size/2)
+#     x2 = x+int(pixel_size/2)
+#     y2 = y+int(pixel_size/2)
+
+#     print(x1,y1,x2,y2)
+
+#     # screensize = Parameters().screenshot_size
+#     # if(y1<0):
+#     #     y1=0
+#     # if(y2>screensize[0]):
+#     #     y2 = screensize[0]
+#     # if(x1<0):
+#     #     x1=0
+#     # if(x2>screensize[1]):
+#     #     x2 = screensize[1]
+#     # print(screensize,x1,y1,x2,y2)
+
+    # screenshot = np.array(ImageGrab.grab(bbox =(x1,y1,x2,y2)).convert('RGB'))
+
+#     if screenshot is None or screenshot.shape[0]==0 or  screenshot.shape[1]==0:
+#         raise CustomException("Error: screenshot is wrongly fetched, screenshot: ,", screenshot)
+
+#     if SAVE_PATH is not None:
+#         cv2.imwrite(SAVE_PATH,screenshot)
+
+#     # im = auto.screenshot(imageFilename="screenshot.png", region=(x,y,pixel_size,pixel_size))
+#     return None
+
 def takeSnapshotAroundCursor(pixel_size, SAVE_PATH=None):
     """
-    pixel_size: screenshot size: pixel_size*pixel_size
-    SAVE_PATH:(optional) where to save image
     returns the image of pixel_size*pixel_size  surrounding the cursor
     """
-    x = auto.position()[0]
-    y = auto.position()[1]
-    x1 = x-int(pixel_size/2)
-    y1 = y-int(pixel_size/2)
-    x2 = x+int(pixel_size/2)
-    y2 = y+int(pixel_size/2)
+    half_length = int(pixel_size/2)
+    # w = auto.position()[0]
+    # h = auto.position()[1]
 
-    screensize = Parameters().screenshot_size
-    if(y1<0):
-        y1=0
-    if(y2>screensize[0]):
-        y2 = screensize[0]
-    if(x1<0):
-        x1=0
-    if(x2>screensize[1]):
-        x2 = screensize[1]
+    # screenshot = np.array(ImageGrab.grab().convert('RGB'))
+    screenshot = np.array(auto.screenshot())
 
-    screenshot = np.array(ImageGrab.grab(bbox =(x1,y1,x2,y2)).convert('RGB'))
+    # screenshot_h,screenshot_w = Parameters().screenshot_size
+    screenshot_h,screenshot_w,_ = screenshot.shape
+    mouse_screen_w,mouse_screen_h = auto.size()
 
-    if screenshot is None or screenshot.shape[0]==0 or  screenshot.shape[1]==0:
-        raise CustomException("Error: screenshot is wrongly fetched, screenshot: ,", screenshot)
+    mouse = Controller()
+    w,h = mouse.position
+    w = w*screenshot_w/mouse_screen_w
+    h = h*screenshot_h/mouse_screen_h
 
-    if SAVE_PATH is not None:
-        cv2.imwrite(SAVE_PATH,screenshot)
+    w,h = (int(w),int(h))
+    print(w,h)
 
-    return screenshot
+    heightup = h-half_length
+    heightdown = h+half_length
+    wleft = w-half_length
+    wright = w+half_length
 
 
+    print(screenshot.shape)
 
+    print(heightup,heightdown,wleft,wright)
+    screenh,screenw = screenshot.shape[:-1]
+    if(heightup<0):
+        heightup=0
+    if(heightdown>screenshot.shape[0]):
+        heightdown = screenshot.shape[0]
 
+    if(wleft<0):
+        wleft=0
+    if(wright>screenshot.shape[1]):
+        wright = screenshot.shape[1]
 
+    # snip = screenshot[heightup:heightdown,wleft:wright]
+    print(heightup,heightdown,wleft,wright)
+    print(wleft,heightup,wright-wleft,heightdown-heightup)
+    auto.screenshot(imageFilename=SAVE_PATH, region=(wleft,heightup,wright-wleft,heightdown-heightup))
+
+    # print(heightup,heightdown,wleft,wright)
+    # if SAVE_PATH is not None:
+    #     cv2.imwrite("ss_" + SAVE_PATH, screenshot)
+    #     cv2.imwrite(SAVE_PATH,snip)
+    return None
 
 def getActiveWindow(sleep_time=0):
     """

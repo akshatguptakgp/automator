@@ -17,6 +17,7 @@ import pynput
 from EventRecord import EventRecord
 import script
 import importlib
+from Parameters import Parameters
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-log", "--log", default="info",help=("Provide logging level. "    "Example --log debug', default='warning'"),)
@@ -30,6 +31,9 @@ class MainWindow(QtWidgets.QMainWindow):
     self.ui = uic.loadUi('ui.ui', self)
     self.ui.recordingButton.clicked.connect(self.recordingButtonPressed)
     self.ui.runButton.clicked.connect(self.runButtonPressed)
+
+    # Reload params
+    Parameters().getScreensize()
 
   def recordingButtonPressed(self):
     log.debug("recordingButtonPressed clicked")
@@ -48,11 +52,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
   def runButtonPressed(self):
     log.debug("runButtonPressed clicked")
-    script.main() # creating script_csv.py fille
-    
-    import script_csv
-    importlib.reload(script_csv)
-    script_csv.main() #calling script_csv fille
+    # script.main() # creating script_csv.py fille
+    # import script_csv
+    # importlib.reload(script_csv)
+    # script_csv.main() #calling script_csv fille
+    utils.takeSnapshotAroundCursor(200,"screenshot.jpg")
 
 if __name__ == '__main__':
   app = QtWidgets.QApplication(sys.argv)

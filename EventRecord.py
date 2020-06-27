@@ -5,7 +5,7 @@ Created on Sun Jun  7 23:13:46 2020
 
 @author: sumityadav
 """
-
+import pyautogui
 from pynput import mouse
 from pynput import keyboard
 import time
@@ -41,8 +41,9 @@ class EventRecord:
         self.listener_mouse.start()
         self.ui = ui
         self.LEFT_KEY_PRESSED_FLAG = False
-        keyboard.start_recording()
+        self.SCREEN_WIDTH,self.SCREEN_HEIGHT = pyautogui.size()
 
+        keyboard.start_recording() # Don't put anythiing below this line
 
     def on_press(self, key):
         try:
@@ -67,6 +68,7 @@ class EventRecord:
     def on_move(self, x, y):
         # print('Pointer moved to {0}'.format(
         #     (x, y)))
+
         if x==0 and y==0:
             rk = keyboard.stop_recording()
             self.save_keyboard_events_to_df(rk)
@@ -76,6 +78,9 @@ class EventRecord:
             print("STOPPED THE PROCESS")
             print("SUCCESSFULLY")
 
+        x = x/self.SCREEN_WIDTH
+        y = y/self.SCREEN_HEIGHT
+
         if self.LEFT_KEY_PRESSED_FLAG:
             self.df = self.df.append({"button": "moveTo", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": "None"}, ignore_index=True)
 
@@ -84,9 +89,12 @@ class EventRecord:
 
     def on_click(self, x, y, button, pressed):
         # print(button)
-        # print('{0} at {1}'.format(
-        #     'Pressed' if pressed else 'Released',
-        #     (x, y)))
+        print('{0} at {1}'.format(
+            'Pressed' if pressed else 'Released',
+            (x, y)))
+        print("self.SCREEN_WIDTH,self.SCREEN_HEIGHT: ",self.SCREEN_WIDTH,self.SCREEN_HEIGHT)
+        x = x/self.SCREEN_WIDTH
+        y = y/self.SCREEN_HEIGHT
         if str(button)=="Button.left":
             if pressed:
                 self.LEFT_KEY_PRESSED_FLAG=True
@@ -99,8 +107,12 @@ class EventRecord:
         # cv2.imwrite(os.path.join(os.getcwd(), "saved_snips_for_cliks",str(x) + "_" + str(y)+ ".jpg"),snip)
         print(self.df)
 
-
     def on_scroll(self,x, y, dx, dy):
+        x = x/self.SCREEN_WIDTH
+        y = y/self.SCREEN_HEIGHT
+        # dx = dx/self.SCREEN_WIDTH
+        # dy = dy/self.SCREEN_HEIGHT
+
         # print('Scrolled {0} at {1}'.format('down' if dy < 0 else 'up',(x, y)))
         if dy!=0:
             self.df = self.df.append({"button": "vscroll", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": dy}, ignore_index=True)

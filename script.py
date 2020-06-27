@@ -8,6 +8,7 @@ import utils
 def main():
     ## every line corresponds to a command ##
     df = pd.read_csv('commands.csv')
+    SCREEN_WIDTH,SCREEN_HEIGHT = auto.size()
     print(df)
     file1 = open("script_csv.py","w")
     file1.write("import numpy as np \n")
@@ -23,7 +24,7 @@ def main():
     file1.write("        os._exit(0) \n")
     file1.write("    keyboard.add_hotkey('Esc+q', endProgram,suppress=True) \n")
     file1.write("    mouse = Controller() \n")
-    print("-------- .py file --------")
+    # print("-------- .py file --------")
     time_when_pressed = None
     threshold = 1.0
     for index, row in df.iterrows():
@@ -33,7 +34,7 @@ def main():
             #initialize first command
         if index==0 :
             if row.button == "Button.left" or row.button == "Button.right":
-                file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(df.iloc[0].x,df.iloc[0].y,threshold))
+                file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(df.iloc[0].x*SCREEN_WIDTH,df.iloc[0].y*SCREEN_HEIGHT,threshold))
                 file1.write("""    auto.sleep({}) \n""".format(threshold))
 
     #double clicks 4 values remain same!
@@ -47,9 +48,9 @@ def main():
         if row.button == "Button.left" or row.button == "Button.right":
             button_name = row.button.split('.')[1]
             if row.pressed == "pressed":
-                file1.write("""    auto.mouseDown(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x,row.y,duration))
+                file1.write("""    auto.mouseDown(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,duration))
             elif row.pressed == "released":
-                file1.write("""    auto.mouseUp(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x,row.y,duration))
+                file1.write("""    auto.mouseUp(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,duration))
             else:
                 raise utils.CustomException("recordingButton has undefined text")
 
@@ -66,7 +67,7 @@ def main():
             file1.write("""    mouse.scroll(dx={}, dy={}) \n""".format(dx,dy))
 
         elif row.button=="moveTo":
-            file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(row.x,row.y,0.01))#duration
+            file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,0.01))#duration
 
     #keyboard commands
         else:
@@ -79,7 +80,7 @@ def main():
         if (index!=df.shape[0]-1) and (not df.iloc[index+1].isnull().x) and (not df.iloc[index+1].isnull().y) and row.button!="moveTo":
             if (df.iloc[index+1].button=="vscroll" and df.iloc[index].button=="vscroll") or (df.iloc[index+1].button=="hscroll" and df.iloc[index].button=="hscroll"):
                 threshold = 0.0
-            file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(df.iloc[index+1].x,df.iloc[index+1].y,df.iloc[index+1].time-row.time+threshold))
+            file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(df.iloc[index+1].x*SCREEN_WIDTH,df.iloc[index+1].y*SCREEN_HEIGHT,df.iloc[index+1].time-row.time+threshold))
     file1.close()
 
 if __name__ == '__main__':
