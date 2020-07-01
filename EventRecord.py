@@ -14,7 +14,8 @@ import cv2
 import os
 import keyboard
 import utils
-
+from VideoWriterWidget import VideoWriterWidget
+import sys
 def sum(x,y):
     return x+y
 
@@ -38,12 +39,13 @@ class EventRecord:
         self.df = pd.DataFrame()
         self.start_time = time.time()
         # Collect events until released
-        self.listener_mouse = mouse.Listener(on_move=self.on_move,on_click=self.on_click,on_scroll=self.on_scroll, suppress=True)
+        self.listener_mouse = mouse.Listener(on_move=self.on_move,on_click=self.on_click,on_scroll=self.on_scroll, suppress=False)
         self.listener_mouse.start()
         self.ui = ui
         self.LEFT_KEY_PRESSED_FLAG = False
         self.SCREEN_WIDTH,self.SCREEN_HEIGHT = auto.size()
-
+        # src1 = '/Users/sumityadav/Drive/PROJECTS/rajesh_project/PYTHON/PYQT/Re-id_videoplayer/data/skivideo.mp4'
+        # video_writer_widget1 = VideoWriterWidget('Camera 1', src1)
         keyboard.start_recording() # Don't put anythiing below this line
 
     def on_press(self, key):
@@ -79,6 +81,7 @@ class EventRecord:
             self.df.to_csv("commands.csv")
             print("STOPPED THE PROCESS")
             print("SUCCESSFULLY")
+            sys.exit()
 
         x = x/self.SCREEN_WIDTH
         y = y/self.SCREEN_HEIGHT
@@ -107,16 +110,16 @@ class EventRecord:
         self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": time.time()-self.start_time, "pressed": 'pressed' if pressed else 'released'}, ignore_index=True)
         print(self.df)
 
-        #-- Event unsupress
-        print("#-- Event unsupress \n ")
-        button_name = str(button).split('.')[1]
-        SCREEN_WIDTH,SCREEN_HEIGHT = auto.size()
-        if pressed:
-            auto.mouseDown(button=button_name, x=x*SCREEN_WIDTH, y=y*SCREEN_HEIGHT, duration = 0)
-            print("Event unsupress pressed")
-        else:
-            auto.mouseUp(button=button_name, x=x*SCREEN_WIDTH, y=y*SCREEN_HEIGHT, duration = 0)
-            print("Event unsupress released")
+        # #-- Event unsupress
+        # print("#-- Event unsupress \n ")
+        # button_name = str(button).split('.')[1]
+        # SCREEN_WIDTH,SCREEN_HEIGHT = auto.size()
+        # if pressed:
+        #     auto.mouseDown(button=button_name, x=x*SCREEN_WIDTH, y=y*SCREEN_HEIGHT, duration = 0)
+        #     print("Event unsupress pressed")
+        # else:
+        #     auto.mouseUp(button=button_name, x=x*SCREEN_WIDTH, y=y*SCREEN_HEIGHT, duration = 0)
+        #     print("Event unsupress released")
 
     def on_scroll(self,x, y, dx, dy):
         x = x/self.SCREEN_WIDTH
