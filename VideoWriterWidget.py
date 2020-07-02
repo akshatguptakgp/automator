@@ -18,10 +18,10 @@ with mss() as sct:
 from threading import Thread
 import cv2
 import time
-import pyautogui
 import numpy as np
 import time
 from queue import Queue
+from vidgear.gears import ScreenGear
 
 class VideoGet:
     """
@@ -32,17 +32,17 @@ class VideoGet:
 
     def __init__(self):
         self.stopped = False
+        self.stream = ScreenGear().start()
         self.frame = self.grab_screen()
         self.frame_queue = Queue(maxsize = 20)
 
     def grab_screen(self):
         st_time = time.time()
-        img = pyautogui.screenshot()
-        print("pyautogui.screenshot() time taken: ", time.time()-st_time)
-        # convert these pixels to a proper numpy array to work with OpenCV
-        frame = np.array(img)
-        # convert colors from BGR to RGB
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame = self.stream.read()
+        # print("pyautogui.screenshot() time taken: ", time.time()-st_time)
+        # img = pyautogui.screenshot()
+        # frame = np.array(img)
+        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         return frame
 
     def start(self):
@@ -59,6 +59,7 @@ class VideoGet:
             print("grab time taken: ", time.time()-st_time)
 
     def stop(self):
+        self.stream.stop()
         self.stopped = True
 
 class VideoShow:
