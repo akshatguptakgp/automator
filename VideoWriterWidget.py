@@ -21,6 +21,7 @@ import time
 import pyautogui
 import numpy as np
 import time
+from queue import Queue
 
 class VideoGet:
     """
@@ -32,6 +33,7 @@ class VideoGet:
     def __init__(self):
         self.stopped = False
         self.frame = self.grab_screen()
+        self.frame_queue = Queue(maxsize = 20)
 
     def grab_screen(self):
         st_time = time.time()
@@ -51,6 +53,9 @@ class VideoGet:
         while not self.stopped:
             st_time = time.time()
             self.frame = self.grab_screen()
+            if self.frame_queue.full():
+                self.frame_queue.get()
+            self.frame_queue.put([time.time(), self.frame])
             print("grab time taken: ", time.time()-st_time)
 
     def stop(self):

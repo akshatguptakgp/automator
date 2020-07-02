@@ -35,13 +35,15 @@ class MainWindow(QtWidgets.QMainWindow):
     # Reload params
     Parameters().getScreensize()
 
+
   def recordingButtonPressed(self):
     log.debug("recordingButtonPressed clicked")
 
     # toggling start and stop buttons
     if self.ui.recordingButton.text() == "Start":
-        os.system("mkdir saved_snips_for_cliks")
-        os.system("rm saved_snips_for_cliks/*")
+        if not os.path.isdir("saved_snips_for_cliks"):
+            os.mkdir("saved_snips_for_cliks")
+        utils.deleteAllFilesInsideFolder("saved_snips_for_cliks")
         self.ui.recordingButton.setText("Stop")
         self.ui.recordingButton.repaint()
         eventRecord = EventRecord(self.ui)
@@ -57,7 +59,6 @@ class MainWindow(QtWidgets.QMainWindow):
     import script_csv
     importlib.reload(script_csv)
     script_csv.main() #calling script_csv fille
-
 
 if __name__ == '__main__':
   app = QtWidgets.QApplication(sys.argv)

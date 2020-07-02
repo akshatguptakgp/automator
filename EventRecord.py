@@ -14,8 +14,10 @@ import cv2
 import os
 import keyboard
 import utils
-from VideoWriterWidget import VideoWriterWidget
+from VideoWriterWidget import VideoGet
 import sys
+import numpy as np
+
 def sum(x,y):
     return x+y
 
@@ -46,6 +48,8 @@ class EventRecord:
         self.SCREEN_WIDTH,self.SCREEN_HEIGHT = auto.size()
         # src1 = '/Users/sumityadav/Drive/PROJECTS/rajesh_project/PYTHON/PYQT/Re-id_videoplayer/data/skivideo.mp4'
         # video_writer_widget1 = VideoWriterWidget('Camera 1', src1)
+
+        self.video_getter = VideoGet().start()
         keyboard.start_recording() # Don't put anythiing below this line
 
     def on_press(self, key):
@@ -76,6 +80,8 @@ class EventRecord:
             self.listener_mouse.stop()
             rk = keyboard.stop_recording()
             self.save_keyboard_events_to_df(rk)
+            self.video_getter.stop()
+            print("stopped video_getter")
             print(self.df)
             self.df = self.df.sort_values(by=["time"])
             self.df.to_csv("commands.csv")
@@ -93,7 +99,15 @@ class EventRecord:
             # self.ui.recordingButton.repaint()
 
     def on_click(self, x, y, button, pressed):
-        utils.takeSnapshotAroundCursor(200,"saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png")
+        # utils.takeSnapshotAroundCursor(200,"saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png")
+        currentTime = time.time()
+        queue = np.array(self.video_getter.frame_queue.queue)
+        timePreviousSec = 1
+        print("queue[:,0]: ", queue[:,0])
+        print("currentTime-queue[:,0]: ", currentTime-queue[:,0])
+        closest_index = np.argmin(np.abs(currentTime-queue[:,0]-timePreviousSec))
+        print("closest_index: ",closest_index)
+        cv2.imwrite("saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png", np.array(queue[closest_index][1]))
         # print(button)
         print('{0} at {1}'.format(
             'Pressed' if pressed else 'Released',
@@ -109,6 +123,7 @@ class EventRecord:
 
         self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": time.time()-self.start_time, "pressed": 'pressed' if pressed else 'released'}, ignore_index=True)
         print(self.df)
+
 
         # #-- Event unsupress
         # print("#-- Event unsupress \n ")
