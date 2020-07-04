@@ -33,24 +33,41 @@ def deleteAllFilesInsideFolder(folder):
                 shutil.rmtree(file_path)
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
-            
+
 class CustomException(Exception):
     pass
 
-# def searchImageFromScreenshot(template):
-#     """
-#     returns me the coordinates of the the centre of the found image
-#     """
-#     im_color = np.array(ImageGrab.grab())
-#     im = cv2.cvtColor(im_color,cv2.COLOR_BGR2GRAY)
-#     w,h = template.shape[:2]
-#
-#     res = cv2.matchTemplate(im,template,cv2.TM_CCOEFF_NORMED)
-#     loc = np.where( res == np.max(res))
-#     for pt in zip(*loc[::-1]):
-#         point = pt
-#
-#     return point[0]+w/2,point[1]+h/2
+
+def searchImageFromScreenshot(stream, img_path):
+    """
+    returns me the coordinates of the the centre of the found image
+
+    (3149, 16)
+    3174.0 41.0
+    """
+    print("insdie searchImageFromScreenshot")
+    threshold = 0.8
+    template = cv2.imread(img_path,0)
+    im_color = stream.read()
+    im = cv2.cvtColor(im_color,cv2.COLOR_BGR2GRAY)
+    im  = im.astype(np.uint8)
+    w,h = template.shape[:2]
+
+    res = cv2.matchTemplate(im,template,cv2.TM_CCOEFF_NORMED)
+    loc = np.where(res == np.max(res))
+
+    for pt in zip(*loc[::-1]):
+        point = pt
+
+    screenshot_h,screenshot_w,_ = im_color.shape
+    mouse_screen_w,mouse_screen_h = auto.size()
+    x= point[0]+w/2
+    y = point[1]+h/2
+    # 3173.5 25.0
+    x = int(x*mouse_screen_w/screenshot_w)
+    y = int(y*mouse_screen_h/screenshot_h)
+    return x,y
+
 
 def checkIfPointInside(point,bbox):
     """
@@ -64,52 +81,18 @@ def checkIfPointInside(point,bbox):
         return True
     return False
 
-# def takeSnapshotAroundCursor(pixel_size, SAVE_PATH=None):
-#     """
-#     pixel_size: screenshot size: pixel_size*pixel_size
-#     SAVE_PATH:(optional) where to save image
-#     returns the image of pixel_size*pixel_size  surrounding the cursor
-#     """
-#     x = auto.position()[0]
-#     y = auto.position()[1]
-#     x1 = x-int(pixel_size/2)
-#     y1 = y-int(pixel_size/2)
-#     x2 = x+int(pixel_size/2)
-#     y2 = y+int(pixel_size/2)
-
-#     print(x1,y1,x2,y2)
-
-#     # screensize = Parameters().screenshot_size
-#     # if(y1<0):
-#     #     y1=0
-#     # if(y2>screensize[0]):
-#     #     y2 = screensize[0]
-#     # if(x1<0):
-#     #     x1=0
-#     # if(x2>screensize[1]):
-#     #     x2 = screensize[1]
-#     # print(screensize,x1,y1,x2,y2)
-
-    # screenshot = np.array(ImageGrab.grab(bbox =(x1,y1,x2,y2)).convert('RGB'))
-
-#     if screenshot is None or screenshot.shape[0]==0 or  screenshot.shape[1]==0:
-#         raise CustomException("Error: screenshot is wrongly fetched, screenshot: ,", screenshot)
-
-#     if SAVE_PATH is not None:
-#         cv2.imwrite(SAVE_PATH,screenshot)
-
-#     # im = auto.screenshot(imageFilename="screenshot.png", region=(x,y,pixel_size,pixel_size))
-#     return None
-
-def takeSnapshotAroundCursor(pixel_size, SAVE_PATH):
+def cropAroundPoint(screenshot, w, h, pixel_size,SAVE_PATH):
     """
     returns the image of pixel_size*pixel_size  surrounding the cursor
+    w = x coordinates
+    h = y coordinates
     """
     half_length = int(pixel_size/2)
-    screenshot_h,screenshot_w,_ = Parameters().screenshot_size
+    screenshot_h,screenshot_w,_ = screenshot.shape
     mouse_screen_w,mouse_screen_h = auto.size()
-    mouse = Controller()
-    w,h = mouse.position #  position of mouse
+    print(w,h)
+    # mouse = Controller()
+    # w,h = mouse.position #  position of mouse
     w = int(w*screenshot_w/mouse_screen_w)
     h = int(h*screenshot_h/mouse_screen_h)
     heightup = h-half_length
@@ -120,13 +103,14 @@ def takeSnapshotAroundCursor(pixel_size, SAVE_PATH):
         heightup=0
     if(heightdown>screenshot_h):
         heightdown = screenshot_h
-
     if(wleft<0):
         wleft=0
     if(wright>screenshot_w):
         wright = screenshot_w
-    auto.screenshot(imageFilename=SAVE_PATH, region=(wleft,heightup,wright-wleft,heightdown-heightup))
-    return None
+    print("wleft,wright,heightup,heightdown",wleft,"",wright,"",heightup,"",heightdown)
+    print(w,h)
+    cv2.imwrite(SAVE_PATH, screenshot[heightup:heightdown, wleft:wright])
+    return
 
 def getActiveWindow(sleep_time=0):
     """
@@ -232,29 +216,3 @@ def getActiveWindow(sleep_time=0):
     print("Active window bbox: ", active_window_bbox)
 
     return active_software_name, active_window_name, active_window_bbox
-
-def returnCoordinatesOfCursorImage():
-    """
-
-    """
-    pixel_size = 200
-    half_length = int(pixel_size/2)
-    w = auto.position()[0]
-    h = auto.position()[1]
-
-    heightup = h-half_length
-    heightdown = h+half_length
-    wleft = w-half_length
-    wright = w+half_length
-
-    screenshot = np.array(ImageGrab.grab().convert('RGB'))
-    screenh,screenw = screenshot.shape[:-1]
-    if(heightup<0):
-        heightup=0
-    if(heightdown>screenshot.shape[0]):
-        heightdown = screenshot.shape[0]
-    if(wleft<0):
-        wleft=0
-    if(wright>screenshot.shape[1]):
-        wright = screenshot.shape[1]
-    return wleft,heightup,wright,heightdown
