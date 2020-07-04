@@ -16,7 +16,11 @@ def main():
     file1.write("import keyboard \n")
     file1.write("import os \n")
     file1.write("from pynput.mouse import Button, Controller \n")
+    file1.write("from vidgear.gears import ScreenGear \n")
+    file1.write("import utils \n")
+    file1.write("import time \n")
     file1.write("def main(): \n")
+    file1.write("    stream = ScreenGear().start() \n")
     file1.write("    def endProgram(): \n")
     file1.write("        keyboard.unhook_all_hotkeys() \n")
     file1.write("        print('Ending program in between') \n")
@@ -27,6 +31,7 @@ def main():
     # print("-------- .py file --------")
     time_when_pressed = None
     threshold = 1.0
+    waitForImageTime = 10
     for index, row in df.iterrows():
         duration = 2
         if index!=0:
@@ -46,13 +51,15 @@ def main():
 
     #move to actual coordinates
         if row.button == "Button.left" or row.button == "Button.right":
+            file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",{}) \n""".format("saved_snips_for_cliks/" + str(index) +".png",waitForImageTime))
             button_name = row.button.split('.')[1]
             if row.pressed == "pressed":
-                file1.write("""    auto.mouseDown(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,duration))
+                file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,duration))
             elif row.pressed == "released":
-                file1.write("""    auto.mouseUp(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,duration))
+                file1.write("""    auto.mouseUp(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,duration))
             else:
                 raise utils.CustomException("recordingButton has undefined text")
+
 
     #scroll commands
         # elif row.button=="hscroll" or row.button=="vscroll":
@@ -81,6 +88,8 @@ def main():
             if (df.iloc[index+1].button=="vscroll" and df.iloc[index].button=="vscroll") or (df.iloc[index+1].button=="hscroll" and df.iloc[index].button=="hscroll"):
                 threshold = 0.0
             file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(df.iloc[index+1].x*SCREEN_WIDTH,df.iloc[index+1].y*SCREEN_HEIGHT,df.iloc[index+1].time-row.time+threshold))
+
+    file1.write("""    stream.stop() \n""")
     file1.close()
 
 if __name__ == '__main__':

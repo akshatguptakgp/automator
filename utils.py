@@ -49,12 +49,16 @@ def searchImageFromScreenshot(stream, img_path):
     threshold = 0.8
     template = cv2.imread(img_path,0)
     im_color = stream.read()
+    print(im_color.shape)
     im = cv2.cvtColor(im_color,cv2.COLOR_BGR2GRAY)
     im  = im.astype(np.uint8)
     w,h = template.shape[:2]
 
     res = cv2.matchTemplate(im,template,cv2.TM_CCOEFF_NORMED)
-    loc = np.where(res == np.max(res))
+    if np.max(res)>threshold:
+        loc = np.where(res == np.max(res))
+    else:
+        return None,None
 
     for pt in zip(*loc[::-1]):
         point = pt
@@ -216,3 +220,21 @@ def getActiveWindow(sleep_time=0):
     print("Active window bbox: ", active_window_bbox)
 
     return active_software_name, active_window_name, active_window_bbox
+
+
+
+def searchImageFromScreenshotForNSeconds(stream,img_path,N) :
+    time_start = time.time()
+    count=0
+    while True:
+        print(count)
+        count+=1
+        if(time.time()-time_start>N):
+            break
+        x,y = searchImageFromScreenshot(stream,img_path)
+        if x is None and y is None:
+            continue
+        else:
+            print(x,y)
+            return x,y
+    raise CustomException("Error: Image: ", img_path, " not found")
