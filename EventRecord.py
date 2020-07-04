@@ -53,22 +53,24 @@ class EventRecord:
         keyboard.start_recording() # Don't put anythiing below this line
 
     def on_press(self, key):
+        active_software_name, active_window_name, active_window_bbox = utils.getActiveWindow()
         try:
             # print('alphanumeric key {0} pressed'.format(key.char))
-            self.df = self.df.append({"button": key.char, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "pressed"}, ignore_index=True)
+            self.df = self.df.append({"button": key.char, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "pressed","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
         except AttributeError:
             # print('special key {0} pressed'.format(key))
-            self.df = self.df.append({"button": key, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "pressed"}, ignore_index=True)
+            self.df = self.df.append({"button": key, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "pressed","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
         finally:
             print(self.df)
 
     def on_release(self, key):
+        active_software_name, active_window_name, active_window_bbox = utils.getActiveWindow()
         try:
             # print('alphanumeric key {0} pressed'.format(key.char))
-            self.df = self.df.append({"button": key.char, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "released"}, ignore_index=True)
+            self.df = self.df.append({"button": key.char, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "released","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
         except AttributeError:
             # print('special key {0} pressed'.format(key))
-            self.df = self.df.append({"button": key, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "released"}, ignore_index=True)
+            self.df = self.df.append({"button": key, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "released","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
         finally:
             print(self.df)
 
@@ -93,7 +95,8 @@ class EventRecord:
         y = y/self.SCREEN_HEIGHT
 
         if self.LEFT_KEY_PRESSED_FLAG:
-            self.df = self.df.append({"button": "moveTo", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": "None"}, ignore_index=True)
+            active_software_name, active_window_name, active_window_bbox = utils.getActiveWindow()
+            self.df = self.df.append({"button": "moveTo", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": "None","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
 
             # self.ui.recordingButton.setText("Start")
             # self.ui.recordingButton.repaint()
@@ -109,9 +112,7 @@ class EventRecord:
         print("closest_index: ",closest_index)
         img_path = "saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png"
         utils.cropAroundPoint(np.array(queue[closest_index][1]), x,y,40,img_path)
-        print('{0} at {1}'.format(
-            'Pressed' if pressed else 'Released',
-            (x, y)))
+        print('{0} at {1}'.format( 'Pressed' if pressed else 'Released', (x, y)))
         print("self.SCREEN_WIDTH,self.SCREEN_HEIGHT: ",self.SCREEN_WIDTH,self.SCREEN_HEIGHT)
         x = x/self.SCREEN_WIDTH
         y = y/self.SCREEN_HEIGHT
@@ -121,7 +122,8 @@ class EventRecord:
             else:
                 self.LEFT_KEY_PRESSED_FLAG=False
 
-        self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": time.time()-self.start_time, "pressed": 'pressed' if pressed else 'released', "img_path": img_path }, ignore_index=True)
+        active_software_name, active_window_name, active_window_bbox = utils.getActiveWindow()
+        self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": time.time()-self.start_time, "pressed": 'pressed' if pressed else 'released', "img_path": img_path,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox }, ignore_index=True)
         print(self.df)
 
 
@@ -144,10 +146,10 @@ class EventRecord:
 
         # print('Scrolled {0} at {1}'.format('down' if dy < 0 else 'up',(x, y)))
         if dy!=0:
-            self.df = self.df.append({"button": "vscroll", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": dy}, ignore_index=True)
+            self.df = self.df.append({"button": "vscroll", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": dy,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
         if dx!=0:
-            self.df = self.df.append({"button": "hscroll", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": dx}, ignore_index=True)
-
+            self.df = self.df.append({"button": "hscroll", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": dx,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
+    
     def save_keyboard_events_to_df(self,rk):
         for i in range(len(rk)):
             self.df = self.df.append({"button": rk[i].name, "x": None, "y": None, "time":rk[i].time-self.start_time, "pressed": rk[i].event_type}, ignore_index=True)

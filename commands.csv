@@ -1,6 +1,5 @@
-,button,img_path,pressed,time,x,y
-0,Button.left,saved_snips_for_cliks/0.png,pressed,1.586935043334961,0.5079193115234375,0.3596272786458333
-1,moveTo,,None,1.6840031147003174,0.5079193115234375,0.35982530381944444
-2,Button.left,saved_snips_for_cliks/2.png,released,1.7334320545196533,0.5079193115234375,0.35982530381944444
-3,Button.left,saved_snips_for_cliks/3.png,pressed,3.339010000228882,0.9641586303710937,0.006285264756944444
-4,Button.left,saved_snips_for_cliks/4.png,released,3.4850192070007324,0.9641586303710937,0.006285264756944444
+,active_software_name,active_window_bbox,active_window_name,button,img_path,pressed,time,x,y
+0,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',Button.left,saved_snips_for_cliks/0.png,pressed,1.4807989597320557,0.49267578125,0.3624403211805556
+1,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',Button.left,saved_snips_for_cliks/1.png,released,2.1955931186676025,0.49267578125,0.3624403211805556
+2,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',Button.left,saved_snips_for_cliks/2.png,pressed,3.8541722297668457,0.32919158935546877,0.20176052517361112
+3,Finder,"[0.0, 0.0, 2560.0, 1440.0]",b'',Button.left,saved_snips_for_cliks/3.png,released,4.485620021820068,0.32919158935546877,0.20176052517361112
