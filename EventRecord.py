@@ -107,7 +107,8 @@ class EventRecord:
         print("currentTime-queue[:,0]: ", currentTime-queue[:,0])
         closest_index = np.argmin(np.abs(currentTime-queue[:,0]-timePreviousSec))
         print("closest_index: ",closest_index)
-        utils.cropAroundPoint(np.array(queue[closest_index][1]), x,y,30,"saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png")
+        img_path = "saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png"
+        utils.cropAroundPoint(np.array(queue[closest_index][1]), x,y,40,img_path)
         print('{0} at {1}'.format(
             'Pressed' if pressed else 'Released',
             (x, y)))
@@ -120,7 +121,7 @@ class EventRecord:
             else:
                 self.LEFT_KEY_PRESSED_FLAG=False
 
-        self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": time.time()-self.start_time, "pressed": 'pressed' if pressed else 'released'}, ignore_index=True)
+        self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": time.time()-self.start_time, "pressed": 'pressed' if pressed else 'released', "img_path": img_path }, ignore_index=True)
         print(self.df)
 
 

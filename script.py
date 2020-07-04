@@ -51,7 +51,7 @@ def main():
 
     #move to actual coordinates
         if row.button == "Button.left" or row.button == "Button.right":
-            file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",{}) \n""".format("saved_snips_for_cliks/" + str(index) +".png",waitForImageTime))
+            file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",{}) \n""".format(row.img_path, waitForImageTime))
             button_name = row.button.split('.')[1]
             if row.pressed == "pressed":
                 file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,duration))
@@ -90,7 +90,10 @@ def main():
             file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(df.iloc[index+1].x*SCREEN_WIDTH,df.iloc[index+1].y*SCREEN_HEIGHT,df.iloc[index+1].time-row.time+threshold))
 
     file1.write("""    stream.stop() \n""")
+    file1.write("""if __name__ == '__main__': \n""")
+    file1.write("""    main() \n""")
     file1.close()
+
 
 if __name__ == '__main__':
     main()
