@@ -1,5 +1,33 @@
 ,active_software_name,active_window_bbox,active_window_name,button,img_path,pressed,time,x,y
-0,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',Button.left,saved_snips_for_cliks/0.png,pressed,1.4807989597320557,0.49267578125,0.3624403211805556
-1,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',Button.left,saved_snips_for_cliks/1.png,released,2.1955931186676025,0.49267578125,0.3624403211805556
-2,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',Button.left,saved_snips_for_cliks/2.png,pressed,3.8541722297668457,0.32919158935546877,0.20176052517361112
-3,Finder,"[0.0, 0.0, 2560.0, 1440.0]",b'',Button.left,saved_snips_for_cliks/3.png,released,4.485620021820068,0.32919158935546877,0.20176052517361112
+0,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',Button.left,saved_snips_for_cliks/0.png,pressed,1.9515249729156494,0.9647079467773437,0.0037055121527777776
+6,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',c,,down,2.1265060901641846,,
+1,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',moveTo,,None,2.2365100383758545,0.9645950317382812,0.0037055121527777776
+7,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',h,,down,2.2557730674743652,,
+8,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',c,,up,2.2901840209960938,,
+9,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',h,,up,2.364500045776367,,
+10,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',r,,down,2.395174026489258,,
+11,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',r,,up,2.499284029006958,,
+12,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',o,,down,2.517387866973877,,
+13,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',o,,up,2.613054037094116,,
+14,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',m,,down,2.639617919921875,,
+2,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',Button.left,saved_snips_for_cliks/2.png,released,2.6723480224609375,0.9645950317382812,0.0037055121527777776
+15,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',e,,down,2.787997007369995,,
+16,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',m,,up,2.7881579399108887,,
+17,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',e,,up,2.9047129154205322,,
+18,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',enter,,down,3.1907501220703125,,
+19,Python,"[974.0, 510.0, 1586.0, 932.0]",b'AUTOMATOR',enter,,up,3.3184080123901367,,
+20,,,,command,,down,7.559213876724243,,
+21,,,,n,,down,7.625013113021851,,
+22,,,,n,,up,7.7786219120025635,,
+23,,,,command,,up,7.798196077346802,,
+24,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'New Tab',y,,down,8.553270816802979,,
+25,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'New Tab',y,,up,8.665266036987305,,
+26,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'New Tab',enter,,down,8.799025058746338,,
+27,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'New Tab',enter,,up,8.904731035232544,,
+28,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'YouTube',l,,down,10.364518880844116,,
+29,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'New Tab',l,,up,10.5237557888031,,
+30,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'New Tab',enter,,down,10.605730772018433,,
+31,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'New Tab',enter,,up,10.738037824630737,,
+3,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'YouTube',Button.left,saved_snips_for_cliks/3.png,pressed,12.289270877838135,0.13219451904296875,0.03071017795138889
+4,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'LinkedIn',moveTo,,None,14.679775953292847,0.13219451904296875,0.03088107638888889
+5,Google Chrome,"[0.0, 23.0, 2560.0, 1440.0]",b'LinkedIn',Button.left,saved_snips_for_cliks/5.png,released,16.535561084747314,0.13219451904296875,0.03088107638888889

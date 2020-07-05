@@ -19,7 +19,6 @@ from threading import Thread
 import cv2
 import time
 import numpy as np
-import time
 from queue import Queue
 from vidgear.gears import ScreenGear
 
@@ -46,7 +45,7 @@ class VideoGet:
         return frame
 
     def start(self):
-        Thread(target=self.get, args=()).start()
+        Thread(target=self.get, args=(), daemon=True).start()
         return self
 
     def get(self):
@@ -58,7 +57,7 @@ class VideoGet:
             self.frame_queue.put([time.time(), self.frame])
             print("grab time taken: ", time.time()-st_time)
             time.sleep(0.05)
-            
+
     def stop(self):
         self.stream.stop()
         self.stopped = True
