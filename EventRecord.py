@@ -77,7 +77,18 @@ class EventRecord:
         self.listener_mouse.stop()
 
         try:
-            rk = keyboard.stop_recording()
+            # rk = keyboard.stop_recording()
+
+
+            recorded_events_queue, hooked = keyboard._recording
+            print(recorded_events_queue, hooked)
+            try:
+                keyboard.unhook(hooked)
+            except:
+                print("unable to call keyboard.unhook")
+                pass
+
+            rk = list(recorded_events_queue.queue)
             if not exceptionFlag:
                 self.save_keyboard_events_to_df(rk)
         except:
@@ -172,7 +183,7 @@ class EventRecord:
         # App Info Fetch
         print(info_list)
         info_list = info_list[ info_list[:,0]< currentTime-self.windowInfo_timePreviousSec]
-        
+
         t,info = info_list[-1]
         print("info fetch: ", "t: ", t, " currentTime: ", currentTime, info_list[:,0])
 
