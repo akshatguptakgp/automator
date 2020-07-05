@@ -30,3 +30,11 @@ class WindowInfoGetter:
 
     def stop(self):
         self.stopped = True
+        
+#windowInfoGetter = WindowInfoGetter()
+#windowInfoGetter.start()
+#time.sleep(10)
+#windowInfoGetter.stop()
+
+
+

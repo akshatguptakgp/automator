@@ -10,6 +10,9 @@ import pandas as pd
 from Parameters import Parameters
 from pynput.mouse import Button, Controller
 import os, shutil
+if sys.platform in ['Windows', 'win32', 'cygwin']:
+    import wmi
+    import pywintypes
 
 def setupLogger(parser):
     options = parser.parse_args()
@@ -169,7 +172,9 @@ def getActiveWindow(sleep_time=0):
         # http://stackoverflow.com/a/608814/562769,https://stackoverflow.com/questions/14394513/win32gui-get-the-current-active-application-name
         import win32gui
         import win32process
-        import wmi # pip install wmi
+         # pip install wmi
+        import pythoncom
+        pythoncom.CoInitialize()
 
         def get_app_name(hwnd):
             c = wmi.WMI()
@@ -179,16 +184,26 @@ def getActiveWindow(sleep_time=0):
                 for p in c.query('SELECT Name FROM Win32_Process WHERE ProcessId = %s' % str(pid)):
                     exe = p.Name
                     break
+                return exe
+
             except:
                 return None
-            else:
-                return exe
+                
 
 
         window = win32gui.GetForegroundWindow()
         active_software_name = get_app_name(window)
-        active_window_bbox = win32gui.GetWindowRect(window)
+        
+        try:
+           active_window_bbox = win32gui.GetWindowRect(window)
+        except pywintypes.error:
+            print("1400, invalid window handle")
+            active_window_bbox = None
         active_window_name = win32gui.GetWindowText(window)
+#        window = win32gui.GetForegroundWindow()
+#        active_software_name = get_app_name(window)
+#        active_window_bbox = win32gui.GetWindowRect(window)
+#        active_window_name = win32gui.GetWindowText(window)
 
     elif sys.platform in ['Mac', 'darwin', 'os2', 'os2emx']:
         # http://stackoverflow.com/a/373310/562769

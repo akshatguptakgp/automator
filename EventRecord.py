@@ -162,13 +162,18 @@ class EventRecord:
         # print("currentTime-queue[:,0]: ", currentTime-queue[:,0])
         # closest_index = np.argmin(np.abs(currentTime-queue[:,0]-self.frame_timePreviousSec))
         # utils.cropAroundPoint(np.array(queue[closest_index][1]), x,y,40,img_path)
-
+        if(queue.shape[0]==0 or info_list.shape[0]==0):
+            print(queue.shape,info_list.shape)
+            self.stop_event_recording(exceptionFlag = True)
         t,frame = queue[ queue[:,0]< currentTime-self.frame_timePreviousSec][-1]
         img_path = "saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png"
         utils.cropAroundPoint(np.array(frame), x,y,40,img_path)
         print("frame fetch: ", "t: ", t, " currentTime: ", currentTime, queue[:,0])
         # App Info Fetch
-        t,info = info_list[ info_list[:,0]< currentTime-self.windowInfo_timePreviousSec][-1]
+        print(info_list)
+        info_list = info_list[ info_list[:,0]< currentTime-self.windowInfo_timePreviousSec]
+        
+        t,info = info_list[-1]
         print("info fetch: ", "t: ", t, " currentTime: ", currentTime, info_list[:,0])
 
         # print("closest_index: ",closest_index)
