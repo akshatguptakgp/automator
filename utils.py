@@ -1,3 +1,4 @@
+import pyttsx3
 import time
 import sys
 import logging
@@ -37,19 +38,18 @@ def deleteAllFilesInsideFolder(folder):
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
+def speakText(text):
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
+
 def CustomException(error_string):
     # importing the pyttsx library
-    import pyttsx3
+    speakText("Hi, Error occured in automator app")
+    speakText(error_string)
+    raise CustomException_(error_string)
 
-    # initialisation
-    engine = pyttsx3.init()
-
-    # testing
-    engine.say("Hi, Error occured in automator app")
-    engine.say(error_string)
-    engine.runAndWait()
-    NewException(error_string)
-class NewException(Exception):
+class CustomException_(Exception):
     pass
 
 
@@ -149,7 +149,7 @@ def getActiveWindow(sleep_time=0):
     active_window_bbox = None
 
     if sys.platform in ['linux', 'linux2']:
-        raise CustomException("sys.platform={platform} is unknown. Please report.".format(platform=sys.platform))
+        CustomException("sys.platform={platform} is unknown. Please report.".format(platform=sys.platform))
 
         # Alternatives: http://unix.stackexchange.com/q/38867/4784
         try:
@@ -240,11 +240,11 @@ def getActiveWindow(sleep_time=0):
                 active_window_bbox   = [geometry['X'], geometry['Y'], geometry['X']+geometry['Width'], geometry['Y']+geometry['Height']]
 
     else:
-        raise CustomException("sys.platform={platform} is unknown. Please report.".format(platform=sys.platform))
+        CustomException("sys.platform={platform} is unknown. Please report.".format(platform=sys.platform))
 
-    print("Active software name: %s" % str(active_software_name))
-    print("Active window name: %s" % str(active_window_name))
-    print("Active window bbox: ", active_window_bbox)
+    # print("Active software name: %s" % str(active_software_name))
+    # print("Active window name: %s" % str(active_window_name))
+    # print("Active window bbox: ", active_window_bbox)
 
     return active_software_name, active_window_name, active_window_bbox
 
@@ -262,9 +262,9 @@ def searchImageFromScreenshotForNSeconds(stream,img_path,N) :
         else:
             print(x,y)
             return x,y
-    raise CustomException("Error: Image: ", img_path, " not found")
+    CustomException("Error: Image: ", img_path, " not found")
 
-def searchAppNameForNSeconds(active_software_name_csv, N):
+def searchAppNameForNSeconds(row_active_software_name, row_active_window_name, row_active_window_bbox,x,y, N):
     print("inside searchAppNameForNSeconds")
     time_start = time.time()
     count=0
@@ -274,8 +274,14 @@ def searchAppNameForNSeconds(active_software_name_csv, N):
         if(time.time()-time_start>N):
             break
         active_software_name, active_window_name, active_window_bbox = getActiveWindow(sleep_time = 0.2)
-        if active_software_name!=active_software_name_csv:
+        if active_software_name!=row_active_software_name:
             continue
         else:
-            return
-    raise CustomException("Error: actual: " + str(active_software_name_csv) + " but getting " + str(active_software_name) )
+            x1,y1,x2,y2 = row_active_window_bbox
+            X1,Y1,X2,Y2 = active_window_bbox
+            X = ((X2-X1)/(x2-x1))*(x-x1) + X1
+            Y = ((Y2-Y1)/(y2-y1))*(y-y1) + Y1
+            print("original: ", (x,y))
+            print("rescaled: ", (X,Y))
+            return X,Y
+    CustomException("Error: actual: " + str(row_active_software_name) + " but getting " + str(active_software_name) )

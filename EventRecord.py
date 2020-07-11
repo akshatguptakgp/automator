@@ -21,6 +21,7 @@ import numpy as np
 import functools
 import copy
 import asyncio
+from threading import Thread
 
 def catch_exception(f):
     @functools.wraps(f)
@@ -67,6 +68,7 @@ class EventRecord:
         self.window_getter = WindowInfoGetter().start()
         self.video_getter = VideoGet().start()
         keyboard.start_recording() # Don't put anythiing below this line
+        self.MAIN_PROCESS_RUNNING_FLAG = True
 
     def stop_event_recording(self,exceptionFlag=False):
         self.video_getter.stop()
@@ -79,8 +81,6 @@ class EventRecord:
 
         try:
             # rk = keyboard.stop_recording()
-
-
             recorded_events_queue, hooked = keyboard._recording
             print(recorded_events_queue, hooked)
             try:
@@ -104,7 +104,7 @@ class EventRecord:
         self.df.to_csv("commands.csv")
         print("STOPPED THE PROCESS")
         print("SUCCESSFULLY")
-        # sys.exit()
+        self.MAIN_PROCESS_RUNNING_FLAG = False
 
     @catch_exception
     def on_move(self, x, y):
@@ -112,7 +112,8 @@ class EventRecord:
         #     (x, y)))
         currentTime = time.time()
         if x==0 and y==0:
-            self.stop_event_recording()
+            if self.MAIN_PROCESS_RUNNING_FLAG:
+                self.stop_event_recording()
 
         x = x/self.SCREEN_WIDTH
         y = y/self.SCREEN_HEIGHT
@@ -128,7 +129,7 @@ class EventRecord:
             # self.ui.recordingButton.setText("Start")
             # self.ui.recordingButton.repaint()
 
-    async def xyz(self,currentTime, x, y, button, pressed ):
+    def xyz(self,currentTime, x, y, button, pressed ):
         queue = np.array(self.video_getter.frame_queue.queue)
         info_list = self.window_getter.info_list
         info_list = copy.deepcopy(info_list)
@@ -162,7 +163,9 @@ class EventRecord:
     @catch_exception
     def on_click(self, x, y, button, pressed):
         currentTime = time.time()
-        asyncio.run(self.xyz(currentTime, x, y, button, pressed))
+        # asyncio.run(self.xyz(currentTime, x, y, button, pressed))
+        Thread(target=self.xyz, args=(currentTime, x, y, button, pressed), daemon=True).start()
+        print("time elapsed in recording on_click: ", time.time()- currentTime)
         return
 
     @catch_exception

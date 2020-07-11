@@ -52,8 +52,9 @@ def main():
 
     #move to actual coordinates
         if row.button == "Button.left" or row.button == "Button.right":
-            file1.write("""    utils.searchAppNameForNSeconds("{}",{}) \n""".format(row.active_software_name,waitForAppNameTime))
-            file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",{}) \n""".format(row.img_path, waitForImageTime))
+            file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
+            file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
+            # file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",{}) \n""".format(row.img_path, waitForImageTime))
             button_name = row.button.split('.')[1]
             if row.pressed == "pressed":
                 file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,duration))
@@ -92,6 +93,7 @@ def main():
             file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(df.iloc[index+1].x*SCREEN_WIDTH,df.iloc[index+1].y*SCREEN_HEIGHT,df.iloc[index+1].time-row.time+threshold))
 
     file1.write("""    stream.stop() \n""")
+    file1.write("""    utils.speakText("Task completed sucessfully") \n""")
     file1.write("""if __name__ == '__main__': \n""")
     file1.write("""    main() \n""")
     file1.close()

@@ -51,7 +51,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.recordingButton.setText("Start")
         self.ui.recordingButton.repaint()
     else:
-        raise utils.CustomException("recordingButton has undefined text")
+        utils.CustomException("recordingButton has undefined text")
 
   def runButtonPressed(self):
     log.debug("runButtonPressed clicked")
