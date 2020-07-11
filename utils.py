@@ -253,3 +253,23 @@ def searchImageFromScreenshotForNSeconds(stream,img_path,N) :
             print(x,y)
             return x,y
     raise CustomException("Error: Image: ", img_path, " not found")
+    
+    
+    
+    
+def searchAppNameForNSeconds(active_software_name_csv, N):
+    print("inside searchAppNameForNSeconds")
+    time_start = time.time()
+    count=0
+    while True:
+        print(count)
+        count+=1
+        if(time.time()-time_start>N):
+            break
+        active_software_name, active_window_name, active_window_bbox = getActiveWindow(sleep_time = 0.2)
+        if active_software_name!=active_software_name_csv:
+            continue
+        else:
+            return   
+    raise CustomException("Error: actual: ",active_software_name_csv ," but getting ",active_software_name )
+    

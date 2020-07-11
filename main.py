@@ -56,9 +56,10 @@ class MainWindow(QtWidgets.QMainWindow):
   def runButtonPressed(self):
     log.debug("runButtonPressed clicked")
     script.main() # creating script_csv.py fille
-    import script_csv
-    importlib.reload(script_csv)
-    script_csv.main() #calling script_csv fille
+#    import script_csv
+#    importlib.reload(script_csv)
+#    script_csv.main() #calling script_csv fille
+    os.system("python script_csv.py")
 
 if __name__ == '__main__':
   app = QtWidgets.QApplication(sys.argv)

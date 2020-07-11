@@ -29,9 +29,10 @@ def main():
     file1.write("    keyboard.add_hotkey('Esc+q', endProgram,suppress=True) \n")
     file1.write("    mouse = Controller() \n")
     # print("-------- .py file --------")
-    time_when_pressed = None
     threshold = 1.0
     waitForImageTime = 10
+    waitForAppNameTime = 5
+    
     for index, row in df.iterrows():
         duration = 2
         if index!=0:
@@ -51,6 +52,7 @@ def main():
 
     #move to actual coordinates
         if row.button == "Button.left" or row.button == "Button.right":
+            file1.write("""    utils.searchAppNameForNSeconds("{}",{}) \n""".format(row.active_software_name,waitForAppNameTime))
             file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",{}) \n""".format(row.img_path, waitForImageTime))
             button_name = row.button.split('.')[1]
             if row.pressed == "pressed":
