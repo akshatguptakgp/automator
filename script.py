@@ -32,7 +32,7 @@ def main():
     threshold = 1.0
     waitForImageTime = 10
     waitForAppNameTime = 5
-    
+
     for index, row in df.iterrows():
         duration = 2
         if index!=0:

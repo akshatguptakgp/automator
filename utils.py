@@ -37,7 +37,19 @@ def deleteAllFilesInsideFolder(folder):
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-class CustomException(Exception):
+def CustomException(error_string):
+    # importing the pyttsx library
+    import pyttsx3
+
+    # initialisation
+    engine = pyttsx3.init()
+
+    # testing
+    engine.say("Hi, Error occured in automator app")
+    engine.say(error_string)
+    engine.runAndWait()
+    NewException(error_string)
+class NewException(Exception):
     pass
 
 
@@ -188,12 +200,12 @@ def getActiveWindow(sleep_time=0):
 
             except:
                 return None
-                
+
 
 
         window = win32gui.GetForegroundWindow()
         active_software_name = get_app_name(window)
-        
+
         try:
            active_window_bbox = win32gui.GetWindowRect(window)
         except pywintypes.error:
@@ -236,8 +248,6 @@ def getActiveWindow(sleep_time=0):
 
     return active_software_name, active_window_name, active_window_bbox
 
-
-
 def searchImageFromScreenshotForNSeconds(stream,img_path,N) :
     time_start = time.time()
     count=0
@@ -253,10 +263,7 @@ def searchImageFromScreenshotForNSeconds(stream,img_path,N) :
             print(x,y)
             return x,y
     raise CustomException("Error: Image: ", img_path, " not found")
-    
-    
-    
-    
+
 def searchAppNameForNSeconds(active_software_name_csv, N):
     print("inside searchAppNameForNSeconds")
     time_start = time.time()
@@ -270,6 +277,5 @@ def searchAppNameForNSeconds(active_software_name_csv, N):
         if active_software_name!=active_software_name_csv:
             continue
         else:
-            return   
-    raise CustomException("Error: actual: ",active_software_name_csv ," but getting ",active_software_name )
-    
+            return
+    raise CustomException("Error: actual: " + str(active_software_name_csv) + " but getting " + str(active_software_name) )

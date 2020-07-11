@@ -3,3 +3,12 @@ logging
 PyQt5
 pyautogui
 pynput
+vidgear
+keyboard
+pyttsx3
+pandas
+opencv-python
+pillow
+numpy
+logging
+

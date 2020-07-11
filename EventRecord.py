@@ -20,6 +20,7 @@ import sys
 import numpy as np
 import functools
 import copy
+import asyncio
 
 def catch_exception(f):
     @functools.wraps(f)
@@ -106,42 +107,10 @@ class EventRecord:
         # sys.exit()
 
     @catch_exception
-    def on_press(self, key):
-        info_list = self.window_getter.info_list
-        info_list = copy.deepcopy(info_list)
-        info_list = np.array(info_list)
-        t,info = info_list[ info_list[:,0]< time.time()-self.windowInfo_timePreviousSec][-1]
-        active_software_name, active_window_name, active_window_bbox = info
-        try:
-            # print('alphanumeric key {0} pressed'.format(key.char))
-            self.df = self.df.append({"button": key.char, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "pressed","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
-        except AttributeError:
-            # print('special key {0} pressed'.format(key))
-            self.df = self.df.append({"button": key, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "pressed","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
-        finally:
-            print(self.df)
-
-    @catch_exception
-    def on_release(self, key):
-        info_list = self.window_getter.info_list
-        info_list = copy.deepcopy(info_list)
-        info_list = np.array(info_list)
-        t,info = info_list[ info_list[:,0]< time.time()-self.windowInfo_timePreviousSec][-1]
-        active_software_name, active_window_name, active_window_bbox = info
-        try:
-            # print('alphanumeric key {0} pressed'.format(key.char))
-            self.df = self.df.append({"button": key.char, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "released","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
-        except AttributeError:
-            # print('special key {0} pressed'.format(key))
-            self.df = self.df.append({"button": key, "x": None, "y": None, "time": time.time()-self.start_time, "pressed": "released","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
-        finally:
-            print(self.df)
-
-    @catch_exception
     def on_move(self, x, y):
         # print('Pointer moved to {0}'.format(
         #     (x, y)))
-
+        currentTime = time.time()
         if x==0 and y==0:
             self.stop_event_recording()
 
@@ -152,27 +121,19 @@ class EventRecord:
             info_list = self.window_getter.info_list
             info_list = copy.deepcopy(info_list)
             info_list = np.array(info_list)
-            t,info = info_list[ info_list[:,0]< time.time()-self.windowInfo_timePreviousSec][-1]
+            t,info = info_list[ info_list[:,0]< currentTime-self.windowInfo_timePreviousSec][-1]
             active_software_name, active_window_name, active_window_bbox = info
-            self.df = self.df.append({"button": "moveTo", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": "None","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
+            self.df = self.df.append({"button": "moveTo", "x": x, "y": y, "time": currentTime-self.start_time, "pressed": "None","active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
 
             # self.ui.recordingButton.setText("Start")
             # self.ui.recordingButton.repaint()
 
-    @catch_exception
-    def on_click(self, x, y, button, pressed):
-        # utils.takeSnapshotAroundCursor(200,"saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png")
-        currentTime = time.time()
+    async def xyz(self,currentTime, x, y, button, pressed ):
         queue = np.array(self.video_getter.frame_queue.queue)
         info_list = self.window_getter.info_list
         info_list = copy.deepcopy(info_list)
         info_list = np.array(info_list)
 
-        # imageFetch
-        # print("queue[:,0]: ", queue[:,0])
-        # print("currentTime-queue[:,0]: ", currentTime-queue[:,0])
-        # closest_index = np.argmin(np.abs(currentTime-queue[:,0]-self.frame_timePreviousSec))
-        # utils.cropAroundPoint(np.array(queue[closest_index][1]), x,y,40,img_path)
         if(queue.shape[0]==0 or info_list.shape[0]==0):
             print(queue.shape,info_list.shape)
             self.stop_event_recording(exceptionFlag = True)
@@ -186,10 +147,6 @@ class EventRecord:
 
         t,info = info_list[-1]
         print("info fetch: ", "t: ", t, " currentTime: ", currentTime, info_list[:,0])
-
-        # print("closest_index: ",closest_index)
-        # print('{0} at {1}'.format( 'Pressed' if pressed else 'Released', (x, y)))
-        # print("self.SCREEN_WIDTH,self.SCREEN_HEIGHT: ",self.SCREEN_WIDTH,self.SCREEN_HEIGHT)
         x = x/self.SCREEN_WIDTH
         y = y/self.SCREEN_HEIGHT
         if str(button)=="Button.left":
@@ -199,23 +156,18 @@ class EventRecord:
                 self.LEFT_KEY_PRESSED_FLAG=False
 
         active_software_name, active_window_name, active_window_bbox = info
-        self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": time.time()-self.start_time, "pressed": 'pressed' if pressed else 'released', "img_path": img_path,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox }, ignore_index=True)
+        self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": currentTime-self.start_time, "pressed": 'pressed' if pressed else 'released', "img_path": img_path,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox }, ignore_index=True)
         print(self.df)
 
-
-        # #-- Event unsupress
-        # print("#-- Event unsupress \n ")
-        # button_name = str(button).split('.')[1]
-        # SCREEN_WIDTH,SCREEN_HEIGHT = auto.size()
-        # if pressed:
-        #     auto.mouseDown(button=button_name, x=x*SCREEN_WIDTH, y=y*SCREEN_HEIGHT, duration = 0)
-        #     print("Event unsupress pressed")
-        # else:
-        #     auto.mouseUp(button=button_name, x=x*SCREEN_WIDTH, y=y*SCREEN_HEIGHT, duration = 0)
-        #     print("Event unsupress released")
+    @catch_exception
+    def on_click(self, x, y, button, pressed):
+        currentTime = time.time()
+        asyncio.run(self.xyz(currentTime, x, y, button, pressed))
+        return
 
     @catch_exception
     def on_scroll(self,x, y, dx, dy):
+        currentTime = time.time()
         x = x/self.SCREEN_WIDTH
         y = y/self.SCREEN_HEIGHT
         # dx = dx/self.SCREEN_WIDTH
@@ -230,9 +182,9 @@ class EventRecord:
         active_software_name, active_window_name, active_window_bbox = info
 
         if dy!=0:
-            self.df = self.df.append({"button": "vscroll", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": dy,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
+            self.df = self.df.append({"button": "vscroll", "x": x, "y": y, "time": currentTime-self.start_time, "pressed": dy,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
         if dx!=0:
-            self.df = self.df.append({"button": "hscroll", "x": x, "y": y, "time": time.time()-self.start_time, "pressed": dx,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
+            self.df = self.df.append({"button": "hscroll", "x": x, "y": y, "time": currentTime-self.start_time, "pressed": dx,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox}, ignore_index=True)
 
     @catch_exception
     def save_keyboard_events_to_df(self,rk):
