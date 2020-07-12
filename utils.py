@@ -1,3 +1,4 @@
+from vidgear.gears import ScreenGear
 import pyttsx3
 import time
 import sys
@@ -53,17 +54,28 @@ class CustomException_(Exception):
     pass
 
 
-def searchImageFromScreenshot(stream, img_path):
+def searchImageFromScreenshot(stream, img_path, bbox=None):
     """
     returns me the coordinates of the the centre of the found image
 
     (3149, 16)
     3174.0 41.0
     """
+    print(bbox)
     print("insdie searchImageFromScreenshot")
     threshold = 0.8
     template = cv2.imread(img_path,0)
-    im_color = stream.read()
+    if bbox is not None:
+        # define dimensions of screen w.r.t to given monitor to be captured
+        x1,y1,x2,y2 = bbox
+        options = {'top': y1, 'left': x1, 'width': x2-x1, 'height': y2-y1}
+        # open video stream with defined parameters
+        stream = ScreenGear(**options).start()
+        im_color = stream.read(bbox)
+        stream.close()
+    else:
+        im_color = stream.read() # im_color = stream.read(bbox)  bbox 100x100
+
     print(im_color.shape)
     im = cv2.cvtColor(im_color,cv2.COLOR_BGR2GRAY)
     im  = im.astype(np.uint8)
@@ -248,7 +260,27 @@ def getActiveWindow(sleep_time=0):
 
     return active_software_name, active_window_name, active_window_bbox
 
-def searchImageFromScreenshotForNSeconds(stream,img_path,N) :
+
+def get_bbox_around_pixel(w,h,half_length=50):
+    w = int(w*screenshot_w/mouse_screen_w)
+    h = int(h*screenshot_h/mouse_screen_h)
+    heightup = h-half_length
+    heightdown = h+half_length
+    wleft = w-half_length
+    wright = w+half_length
+    if(heightup<0):
+        heightup=0
+    if(heightdown>screenshot_h):
+        heightdown = screenshot_h
+    if(wleft<0):
+        wleft=0
+    if(wright>screenshot_w):
+        wright = screenshot_w
+    return [wleft,heightup,wright,heightdown]
+
+def searchImageFromScreenshotForNSeconds(stream,img_path,w,h,N) :
+    """
+    """
     time_start = time.time()
     count=0
     while True:
@@ -256,7 +288,13 @@ def searchImageFromScreenshotForNSeconds(stream,img_path,N) :
         count+=1
         if(time.time()-time_start>N):
             break
-        x,y = searchImageFromScreenshot(stream,img_path)
+
+
+        bbox = get_bbox_around_pixel(w,h,half_length=100)
+        print(bbox)
+        x,y = searchImageFromScreenshot(stream,img_path,bbox)
+
+        # x,y = searchImageFromScreenshot(stream,img_path)
         if x is None and y is None:
             continue
         else:
