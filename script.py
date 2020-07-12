@@ -30,7 +30,7 @@ def main():
     file1.write("    mouse = Controller() \n")
     # print("-------- .py file --------")
     threshold = 1.0
-    waitForImageTime = 10
+    waitForImageTime = 2
     waitForAppNameTime = 5
 
     for index, row in df.iterrows():
@@ -54,7 +54,7 @@ def main():
         if row.button == "Button.left" or row.button == "Button.right":
             file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
             file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
-            # file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",{}) \n""".format(row.img_path, waitForImageTime))
+            file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",x=x, y=y, N={}) \n""".format(row.img_path, waitForImageTime))
             button_name = row.button.split('.')[1]
             if row.pressed == "pressed":
                 file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,duration))

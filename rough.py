@@ -1,33 +1,37 @@
-import functools
+# import required libraries
+from vidgear.gears import ScreenGear
+import cv2
+
+# define dimensions of screen w.r.t to given monitor to be captured
+options = {'top': -40, 'left': -40, 'width': 100, 'height': 100}
+
+# open video stream with defined parameters
+stream = ScreenGear(**options).start()
+
+# loop over
+while True:
+
+    # read frames from stream
+    frame = stream.read()
+
+    # check for frame if Nonetype
+    if frame is None:
+        break
 
 
-
-def catch_exception(f):
-    @functools.wraps(f)
-    def func(self, *args, **kwargs):
-        try:
-            return f(self,*args, **kwargs)
-        except Exception as e:
-            print(" ******** :", self.val)
-            print('Caught an exception in', f.__name__)
-            raise
-    return func
-
-class Test(object):
-    def __init__(self, val):
-        self.val = val
-
-    @catch_exception
-    def calc():
-        return self.val / 0
-
-t = Test(3)
-t.calc()
+    # {do something with the frame here}
 
 
-# def decorator(func):
-#     def _decorator(self, *args, **kwargs):
-#         # access a from TestSample
-#         print 'self is %s' % self
-#         return func(self, *args, **kwargs)
-#     return _decorator
+    # Show output window
+    cv2.imshow("Output Frame", frame)
+
+    # check for 'q' key if pressed
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord("q"):
+        break
+
+# close output window
+cv2.destroyAllWindows()
+
+# safely close video stream
+stream.stop()

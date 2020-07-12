@@ -65,18 +65,15 @@ def searchImageFromScreenshot(stream, img_path, bbox=None):
     print("insdie searchImageFromScreenshot")
     threshold = 0.8
     template = cv2.imread(img_path,0)
-    if bbox is not None:
-        # define dimensions of screen w.r.t to given monitor to be captured
-        x1,y1,x2,y2 = bbox
-        options = {'top': y1, 'left': x1, 'width': x2-x1, 'height': y2-y1}
-        # open video stream with defined parameters
-        stream = ScreenGear(**options).start()
-        im_color = stream.read(bbox)
-        stream.close()
-    else:
-        im_color = stream.read() # im_color = stream.read(bbox)  bbox 100x100
 
-    print(im_color.shape)
+    im_color = stream.read() # im_color = stream.read(bbox)  bbox 100x100
+    screenshot_h,screenshot_w,_ = im_color.shape
+
+    if bbox is not None:
+        x1,y1,x2,y2 = np.array(bbox,dtype='int')
+        im_color = im_color[y1:y2,x1:x2]
+
+    print("im_color.shape: ",im_color.shape)
     im = cv2.cvtColor(im_color,cv2.COLOR_BGR2GRAY)
     im  = im.astype(np.uint8)
     w,h = template.shape[:2]
@@ -90,13 +87,28 @@ def searchImageFromScreenshot(stream, img_path, bbox=None):
     for pt in zip(*loc[::-1]):
         point = pt
 
-    screenshot_h,screenshot_w,_ = im_color.shape
     mouse_screen_w,mouse_screen_h = auto.size()
-    x= point[0]+w/2
+    x = point[0]+w/2
     y = point[1]+h/2
-    # 3173.5 25.0
+
+
+
+    print("debug 1 : ", (x,y))
+    if bbox is not None:
+        print("adding offset")
+        x1,y1,x2,y2 = bbox
+        x += x1
+        y += y1
+
+    img_debug = stream.read()
+    cv2.rectangle(img_debug, (int(x),int(y)), (int(x + w), int(y + h)), (0,0,255), 2)
+    cv2.imwrite("saved_snips_for_cliks/img_debug.jpg",img_debug)
+    print("debug 2 : ", (x,y))
+
     x = int(x*mouse_screen_w/screenshot_w)
     y = int(y*mouse_screen_h/screenshot_h)
+
+    print("# DEBUG: x,y,mouse_screen_w,screenshot_w: ", x,y,mouse_screen_w,screenshot_w)
     return x,y
 
 
@@ -262,23 +274,21 @@ def getActiveWindow(sleep_time=0):
 
 
 def get_bbox_around_pixel(w,h,half_length=50):
-    w = int(w*screenshot_w/mouse_screen_w)
-    h = int(h*screenshot_h/mouse_screen_h)
     heightup = h-half_length
     heightdown = h+half_length
     wleft = w-half_length
     wright = w+half_length
     if(heightup<0):
         heightup=0
-    if(heightdown>screenshot_h):
-        heightdown = screenshot_h
+    # if(heightdown>screenshot_h):
+    #     heightdown = screenshot_h
     if(wleft<0):
         wleft=0
-    if(wright>screenshot_w):
-        wright = screenshot_w
+    # if(wright>screenshot_w):
+    #     wright = screenshot_w
     return [wleft,heightup,wright,heightdown]
 
-def searchImageFromScreenshotForNSeconds(stream,img_path,w,h,N) :
+def searchImageFromScreenshotForNSeconds(stream,img_path,x,y,N) :
     """
     """
     time_start = time.time()
@@ -288,19 +298,29 @@ def searchImageFromScreenshotForNSeconds(stream,img_path,w,h,N) :
         count+=1
         if(time.time()-time_start>N):
             break
-
-
-        bbox = get_bbox_around_pixel(w,h,half_length=100)
-        print(bbox)
-        x,y = searchImageFromScreenshot(stream,img_path,bbox)
-
-        # x,y = searchImageFromScreenshot(stream,img_path)
-        if x is None and y is None:
+        bbox = get_bbox_around_pixel(x,y,half_length=100)
+        x_output,y_output = searchImageFromScreenshot(stream,img_path,bbox)
+        if x_output is None and y_output is None:
             continue
         else:
-            print(x,y)
-            return x,y
-    CustomException("Error: Image: ", img_path, " not found")
+            print(x_output,y_output)
+            return x_output,y_output
+
+    time_start = time.time()
+    count=0
+    while True:
+        print(count)
+        count+=1
+        if(time.time()-time_start>N):
+            break
+        x_output,y_output = searchImageFromScreenshot(stream,img_path)
+        if x_output is None and y_output is None:
+            continue
+        else:
+            print(x_output,y_output)
+            return x_output,y_output
+
+    CustomException("Error: Image: " + img_path + " not found")
 
 def searchAppNameForNSeconds(row_active_software_name, row_active_window_name, row_active_window_bbox,x,y, N):
     print("inside searchAppNameForNSeconds")
