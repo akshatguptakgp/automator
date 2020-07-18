@@ -25,8 +25,8 @@ class WindowInfoGetter:
             self.info = utils.getActiveWindow()
             self.info_list.append([time.time(), self.info])
             time.sleep(0.01)
-            if len(self.info_list)%200:
-                print("grab time taken: ", time.time()-st_time)
+            # if len(self.info_list)%200:
+                # print("grab time taken: ", time.time()-st_time)
 
     def stop(self):
         self.stopped = True

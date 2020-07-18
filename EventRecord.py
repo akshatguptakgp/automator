@@ -54,6 +54,7 @@ class EventRecord:
     @catch_exception
     def __init__(self,ui):
         self.df = pd.DataFrame()
+        keyboard.add_hotkey('Esc+q', self.endProgram,suppress=True)
         self.frame_timePreviousSec = 1
         self.windowInfo_timePreviousSec = 0.05
         self.start_time = time.time()
@@ -69,6 +70,13 @@ class EventRecord:
         self.video_getter = VideoGet().start()
         keyboard.start_recording() # Don't put anythiing below this line
         self.MAIN_PROCESS_RUNNING_FLAG = True
+
+    def endProgram(self):
+        # keyboard.unhook_all_hotkeys()
+        print('Ending program in between')
+        if self.MAIN_PROCESS_RUNNING_FLAG:
+            self.stop_event_recording()
+
 
     def stop_event_recording(self,exceptionFlag=False):
         self.video_getter.stop()
@@ -111,9 +119,9 @@ class EventRecord:
         # print('Pointer moved to {0}'.format(
         #     (x, y)))
         currentTime = time.time()
-        if x==0 and y==0:
-            if self.MAIN_PROCESS_RUNNING_FLAG:
-                self.stop_event_recording()
+        # if x==0 and y==0:
+        #     if self.MAIN_PROCESS_RUNNING_FLAG:
+        #         self.stop_event_recording()
 
         x = x/self.SCREEN_WIDTH
         y = y/self.SCREEN_HEIGHT
@@ -141,13 +149,13 @@ class EventRecord:
         t,frame = queue[ queue[:,0]< currentTime-self.frame_timePreviousSec][-1]
         img_path = "saved_snips_for_cliks/" + str(self.df.shape[0]) + ".png"
         utils.cropAroundPoint(np.array(frame), x,y,40,img_path)
-        print("frame fetch: ", "t: ", t, " currentTime: ", currentTime, queue[:,0])
+        # print("frame fetch: ", "t: ", t, " currentTime: ", currentTime, queue[:,0])
         # App Info Fetch
-        print(info_list)
+        # print(info_list)
         info_list = info_list[ info_list[:,0]< currentTime-self.windowInfo_timePreviousSec]
 
         t,info = info_list[-1]
-        print("info fetch: ", "t: ", t, " currentTime: ", currentTime, info_list[:,0])
+        # print("info fetch: ", "t: ", t, " currentTime: ", currentTime, info_list[:,0])
         x = x/self.SCREEN_WIDTH
         y = y/self.SCREEN_HEIGHT
         if str(button)=="Button.left":
@@ -158,14 +166,14 @@ class EventRecord:
 
         active_software_name, active_window_name, active_window_bbox = info
         self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": currentTime-self.start_time, "pressed": 'pressed' if pressed else 'released', "img_path": img_path,"active_software_name":active_software_name, "active_window_name":active_window_name, "active_window_bbox":active_window_bbox }, ignore_index=True)
-        print(self.df)
+        # print(self.df)
 
     @catch_exception
     def on_click(self, x, y, button, pressed):
         currentTime = time.time()
         # asyncio.run(self.xyz(currentTime, x, y, button, pressed))
         Thread(target=self.xyz, args=(currentTime, x, y, button, pressed), daemon=True).start()
-        print("time elapsed in recording on_click: ", time.time()- currentTime)
+        # print("time elapsed in recording on_click: ", time.time()- currentTime)
         return
 
     @catch_exception

@@ -55,7 +55,7 @@ class VideoGet:
             if self.frame_queue.full():
                 self.frame_queue.get()
             self.frame_queue.put([time.time(), self.frame])
-            print("grab time taken: ", time.time()-st_time)
+            # print("grab time taken: ", time.time()-st_time)
             time.sleep(0.05)
 
     def stop(self):

@@ -133,7 +133,7 @@ def cropAroundPoint(screenshot, w, h, pixel_size,SAVE_PATH):
     half_length = int(pixel_size/2)
     screenshot_h,screenshot_w,_ = screenshot.shape
     mouse_screen_w,mouse_screen_h = auto.size()
-    print(w,h)
+    # print(w,h)
     # mouse = Controller()
     # w,h = mouse.position #  position of mouse
     w = int(w*screenshot_w/mouse_screen_w)
@@ -150,8 +150,8 @@ def cropAroundPoint(screenshot, w, h, pixel_size,SAVE_PATH):
         wleft=0
     if(wright>screenshot_w):
         wright = screenshot_w
-    print("wleft,wright,heightup,heightdown",wleft,"",wright,"",heightup,"",heightdown)
-    print(w,h)
+    # print("wleft,wright,heightup,heightdown",wleft,"",wright,"",heightup,"",heightdown)
+    # print(w,h)
     cv2.imwrite(SAVE_PATH, screenshot[heightup:heightdown, wleft:wright])
     return
 
