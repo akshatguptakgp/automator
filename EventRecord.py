@@ -171,9 +171,17 @@ class EventRecord:
     @catch_exception
     def on_click(self, x, y, button, pressed):
         currentTime = time.time()
+        print(x,y,pressed)
+	
         # asyncio.run(self.xyz(currentTime, x, y, button, pressed))
-        Thread(target=self.xyz, args=(currentTime, x, y, button, pressed), daemon=True).start()
-        # print("time elapsed in recording on_click: ", time.time()- currentTime)
+        #Thread(target=self.xyz, args=(currentTime, x, y, button, pressed), daemon=True).start()
+        Thread(target=self.dummy_xyz, daemon=True).start()
+
+        print("time elapsed in recording on_click: ", time.time()- currentTime)
+        return
+		
+    def dummy_xyz(self):
+        print("inside dummy") 
         return
 
     @catch_exception
