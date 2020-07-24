@@ -7,7 +7,7 @@ import utils
 
 def main():
     ## every line corresponds to a command ##
-    df = pd.read_csv('commands.csv')
+    df = pd.read_csv('saved_snips_for_cliks/commands.csv')
     SCREEN_WIDTH,SCREEN_HEIGHT = auto.size()
     print(df)
     file1 = open("script_csv.py","w")
