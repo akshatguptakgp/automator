@@ -79,6 +79,8 @@ class EventRecord(QThread):
         while currentTime-st_time < 5:
             currentTime = time.time()
             self.change_value.emit("timer " + str(currentTime))
+            time.sleep(1/60.0)
+#            print("st_time,  curent_time",st_time, currentTime)
 
         self.change_value.emit("")
         return

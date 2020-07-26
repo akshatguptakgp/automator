@@ -45,12 +45,14 @@
      <rect>
       <x>100</x>
       <y>350</y>
-      <width>200</width>
-      <height>16</height>
+      <width>350</width>
+      <height>25</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
     </property>
    </widget>
   </widget>

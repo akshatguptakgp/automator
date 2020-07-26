@@ -37,6 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
   def setProgressVal(self, val):
     # self.progressbar.setValue(val)
     self.labelTimer.setText(val)
+#    self.labelTimer.repaint()
 
   def recordingButtonPressed(self):
     log.debug("recordingButtonPressed clicked")

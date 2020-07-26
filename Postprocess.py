@@ -4,8 +4,9 @@ import utils
 import numpy as np
 import pytesseract
 from PIL import Image
-import re
 
+
+pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files (x86)/Tesseract-OCR/tesseract.exe'
 if __name__ == "__main__":
     csv_file = "saved_snips_for_cliks/commands.csv"
     window_info_file = "saved_snips_for_cliks/WindowInfo.csv"
@@ -26,7 +27,7 @@ if __name__ == "__main__":
     x1,y1,x2,y2 = eval(df_info.active_window_bbox[0])
     heightOffset = y2-y1-400 # w: 612, h: 400,100 X,350 Y,200 W ,16 H
     # frame = frame[int(y1+heightOffset):int(y2),int(x1):int(x2)]
-    x1_,y1_,x2_,y2_ = int(x1+90),int(y1+heightOffset+350),int(x1+100+200),int(y1+heightOffset+350+16)
+    x1_,y1_,x2_,y2_ = int(x1+90),int(y1+heightOffset+350-10),int(x1+100+350),int(y1+heightOffset+350+25)
 
 
 
@@ -35,7 +36,6 @@ if __name__ == "__main__":
       utils.CustomException("Error: screen_recording_file is not present")
 
     fps = round(cap.get(cv2.CAP_PROP_FPS));
-    print(fps)
     frame_no = -1
     df_output = pd.DataFrame()
     while True:
@@ -49,12 +49,17 @@ if __name__ == "__main__":
         frame = frame[y1_:y2_,x1_:x2_]
         filename = "saved_snips_for_cliks/timer_" + str(frame_no)+ ".png"
         cv2.imwrite(filename,frame)
-        # cv2.rectangle(frame,(x1_,y1_), (x2_,y2_),(0,255,0),3)
-        # cv2.imshow('frame',frame)
+#        cv2.rectangle(frame,(x1_,y1_), (x2_,y2_),(0,255,0),3)
+#        cv2.imshow('frame',frame)
+#        cv2.waitKey()
+#        cv2.destroyAllWindows()
         text = pytesseract.image_to_string(Image.open(filename))
+        print(text)
 
         try:
-            if text.split()[0]!="timer":
+            print(text)
+            if "timer" != text.split()[0]:
+                print("breaked", text.split()[0])
                 break
             df_output = df_output.append(
                             { "frame_no": frame_no,
@@ -62,9 +67,9 @@ if __name__ == "__main__":
                             },ignore_index=True)
         except:
             continue
-        print(df_output)
-        print(df_output.shape)
-
+#        print(df_output)
+#        print(df_output.shape) 
+# 
     cap.release()
     df_output.to_csv("saved_snips_for_cliks/timer_video.csv")
 
