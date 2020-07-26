@@ -17,39 +17,46 @@ import pynput
 from EventRecord import EventRecord
 import script
 import importlib
-from Parameters import Parameters
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-log", "--log", default="info",help=("Provide logging level. "    "Example --log debug', default='warning'"),)
 log = utils.setupLogger(parser)
+
 
 class MainWindow(QtWidgets.QMainWindow):
   def __init__(self, *args, **kwargs):
     super(MainWindow, self).__init__(*args, **kwargs)
 
     # Load the UI Page
-    self.ui = uic.loadUi('ui.ui', self)
-    self.ui.recordingButton.clicked.connect(self.recordingButtonPressed)
-    self.ui.runButton.clicked.connect(self.runButtonPressed)
+    uic.loadUi('ui.ui', self)
+    print(self.__dict__.keys())
+    self.recordingButton.clicked.connect(self.recordingButtonPressed)
+    self.runButton.clicked.connect(self.runButtonPressed)
 
-    # Reload params
-    Parameters().getScreensize()
-
+  def setProgressVal(self, val):
+    # self.progressbar.setValue(val)
+    self.labelTimer.setText(val)
 
   def recordingButtonPressed(self):
     log.debug("recordingButtonPressed clicked")
 
     # toggling start and stop buttons
-    if self.ui.recordingButton.text() == "Start":
+    if self.recordingButton.text() == "Start":
         if not os.path.isdir("saved_snips_for_cliks"):
             os.mkdir("saved_snips_for_cliks")
         utils.deleteAllFilesInsideFolder("saved_snips_for_cliks")
-        self.ui.recordingButton.setText("Stop")
-        self.ui.recordingButton.repaint()
-        eventRecord = EventRecord(self.ui)
-    elif self.ui.recordingButton.text() == "Stop":
-        self.ui.recordingButton.setText("Start")
-        self.ui.recordingButton.repaint()
+        self.recordingButton.setText("Stop")
+        self.recordingButton.repaint()
+        eventRecord = EventRecord(self)
+        eventRecord.change_value.connect(self.setProgressVal)
+        eventRecord.start()
+
+
+
+    elif self.recordingButton.text() == "Stop":
+        self.recordingButton.setText("Start")
+        self.recordingButton.repaint()
     else:
         utils.CustomException("recordingButton has undefined text")
 

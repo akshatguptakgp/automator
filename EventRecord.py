@@ -23,6 +23,8 @@ import copy
 import asyncio
 from threading import Thread
 
+from PyQt5.QtCore import QThread, pyqtSignal
+
 def catch_exception(f):
     @functools.wraps(f)
     def func(self, *args, **kwargs):
@@ -35,7 +37,7 @@ def catch_exception(f):
             raise
     return func
 
-class EventRecord:
+class EventRecord(QThread):
     """
     This class represents a bounding box detection in a single image.
 
@@ -51,20 +53,35 @@ class EventRecord:
 
     """
 
+    change_value = pyqtSignal(str)
+
     @catch_exception
-    def __init__(self,ui):
+    def __init__(self,main_instance):
+        super().__init__()
         print("starting time: ", time.time())
+        self.window_getter = WindowInfoGetter().start()
+        self.screen_recorder = ScreenRecorder().start()
         self.df = pd.DataFrame()
         keyboard.add_hotkey('Esc+q', self.endProgram,suppress=True)
         self.listener_mouse = mouse.Listener(on_move=self.on_move,on_click=self.on_click,on_scroll=self.on_scroll, suppress=False)
         self.listener_mouse.start()
-        self.ui = ui
+        self.main_instance = main_instance
         self.LEFT_KEY_PRESSED_FLAG = False
         self.SCREEN_WIDTH,self.SCREEN_HEIGHT = auto.size()
-        self.window_getter = WindowInfoGetter().start()
-        self.screen_recorder = ScreenRecorder().start()
         keyboard.start_recording() # Don't put anythiing below this line
         self.MAIN_PROCESS_RUNNING_FLAG = True
+
+    def run(self):
+        """
+            this function is automatically ran in thread as this class is child of QThread
+        """
+        st_time = currentTime = time.time()
+        while currentTime-st_time < 5:
+            currentTime = time.time()
+            self.change_value.emit("timer " + str(currentTime))
+
+        self.change_value.emit("")
+        return
 
     def endProgram(self):
         # keyboard.unhook_all_hotkeys()

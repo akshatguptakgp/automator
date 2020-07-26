@@ -40,6 +40,19 @@
      <string>RUN APP</string>
     </property>
    </widget>
+   <widget class="QLabel" name="labelTimer">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>350</y>
+      <width>200</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

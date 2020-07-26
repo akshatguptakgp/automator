@@ -32,7 +32,7 @@ class WindowInfoGetter:
                                                 "active_window_bbox": active_window_bbox
                                                 },ignore_index=True)
 
-            print(self.df_info.shape)
+            # print(self.df_info.shape)
             # time.sleep(0.01)
 
             # if len(self.info_list)%200:
@@ -42,7 +42,7 @@ class WindowInfoGetter:
         print("stopping")
         self.stopped = True
         print("saving")
-        self.df_info.to_csv(self.csv_file, index=False, header = False)
+        self.df_info.to_csv(self.csv_file, index=False)
 
 if __name__ == "__main__":
     windowInfoGetter = WindowInfoGetter()

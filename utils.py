@@ -9,7 +9,6 @@ import numpy as np
 import pyautogui as auto
 import pynput
 import pandas as pd
-from Parameters import Parameters
 from pynput.mouse import Button, Controller
 import os, shutil
 if sys.platform in ['Windows', 'win32', 'cygwin']:
