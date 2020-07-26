@@ -62,7 +62,7 @@ def searchImageFromScreenshot(stream, img_path, bbox=None):
     """
     print(bbox)
     print("insdie searchImageFromScreenshot")
-    threshold = 0.8
+    threshold = 0.51
     template = cv2.imread(img_path,0)
 
     im_color = stream.read() # im_color = stream.read(bbox)  bbox 100x100
@@ -78,6 +78,7 @@ def searchImageFromScreenshot(stream, img_path, bbox=None):
     w,h = template.shape[:2]
 
     res = cv2.matchTemplate(im,template,cv2.TM_CCOEFF_NORMED)
+    print(np.max(res))
     if np.max(res)>threshold:
         loc = np.where(res == np.max(res))
     else:
@@ -129,6 +130,7 @@ def cropAroundPoint(screenshot, w, h, pixel_size,SAVE_PATH):
     w = x coordinates
     h = y coordinates
     """
+    # print(w, h, pixel_size,SAVE_PATH)
     half_length = int(pixel_size/2)
     screenshot_h,screenshot_w,_ = screenshot.shape
     mouse_screen_w,mouse_screen_h = auto.size()

@@ -4,10 +4,11 @@ import numpy as np
 import time
 import pyautogui as auto
 import utils
+import ast
 
 def main():
     ## every line corresponds to a command ##
-    df = pd.read_csv('saved_snips_for_cliks/commands.csv')
+    df = pd.read_csv('saved_snips_for_cliks/combined_commands.csv')
     SCREEN_WIDTH,SCREEN_HEIGHT = auto.size()
     print(df)
     file1 = open("script_csv.py","w")
@@ -52,6 +53,10 @@ def main():
 
     #move to actual coordinates
         if row.button == "Button.left" or row.button == "Button.right":
+            print(type(row.active_window_bbox))
+            print(eval(row.active_window_bbox))
+            print(type(eval(row.active_window_bbox)))
+
             file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
             file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
             file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds(stream,"{}",x=x, y=y, N={}) \n""".format(row.img_path, waitForImageTime))

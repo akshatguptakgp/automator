@@ -4,7 +4,10 @@ import numpy
 
 df = pd.read_csv("saved_snips_for_cliks/timer_video.csv")
 
+plt.plot(df.time,df.frame_no)
+plt.show()
 
+"""
 #find slopes for 5 sec
 slope_arr=[]
 for i in range(5):
@@ -18,3 +21,4 @@ for i in range(5):
 
 print(slope_arr)
 print(numpy.median(slope_arr))
+"""
