@@ -62,7 +62,7 @@ def searchImageFromScreenshot(img_path, bbox=None):
     """
     print(bbox)
     print("insdie searchImageFromScreenshot")
-    threshold = 0.85
+    threshold = 0.7 #change this!!
     template = cv2.imread(img_path,0)
 
     # img_org = stream.read() # im_color = stream.read(bbox)  bbox 100x100

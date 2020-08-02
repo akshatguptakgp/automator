@@ -8,6 +8,7 @@ Created on Sun Jun  7 23:13:46 2020
 import pyautogui as auto
 from pynput import mouse
 from pynput import keyboard
+import mouse as mp
 import time
 import pandas as pd
 import cv2
@@ -66,7 +67,7 @@ class EventRecord():
         self.listener_mouse.start()
         self.LEFT_KEY_PRESSED_FLAG = False
         self.SCREEN_WIDTH,self.SCREEN_HEIGHT = auto.size()
-        
+
         try:
             recorded_events_queue, hooked = keyboard._recording
             keyboard.unhook(hooked)
@@ -103,7 +104,7 @@ class EventRecord():
                     self.frameExtractorDfIndexSeen+=1
                     if self.time_completed is not None and self.time_completed < currentTime:
                         continue
-                    
+
                     if (df_commands.button[idx]=="Button.left" or df_commands.button[idx]=="Button.right") and (df_commands.pressed[idx]=="pressed"):
                         frame_queue = self.video_getter.frame_queue.queue
                         queue = np.array(frame_queue)
