@@ -34,11 +34,6 @@ class MainWindow(QtWidgets.QMainWindow):
     self.recordingButton.clicked.connect(self.recordingButtonPressed)
     self.runButton.clicked.connect(self.runButtonPressed)
 
-  def setProgressVal(self, val):
-    # self.progressbar.setValue(val)
-    self.labelTimer.setText(val)
-#    self.labelTimer.repaint()
-
   def recordingButtonPressed(self):
     log.debug("recordingButtonPressed clicked")
 
@@ -49,11 +44,7 @@ class MainWindow(QtWidgets.QMainWindow):
         utils.deleteAllFilesInsideFolder("saved_snips_for_cliks")
         self.recordingButton.setText("Stop")
         self.recordingButton.repaint()
-        eventRecord = EventRecord(self)
-        eventRecord.change_value.connect(self.setProgressVal)
-        eventRecord.start()
-
-
+        eventRecord = EventRecord()
 
     elif self.recordingButton.text() == "Stop":
         self.recordingButton.setText("Start")

@@ -46,7 +46,7 @@ class ScreenRecorder:
             print("started video recording")
         else:
             utils.CustomException("sys.platform={platform} is unknown. Please report.".format(platform=sys.platform))
-            
+
         return self
     def stop(self):
         if sys.platform in ['Windows', 'win32', 'cygwin']:

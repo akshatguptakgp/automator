@@ -53,7 +53,7 @@ class CustomException_(Exception):
     pass
 
 
-def searchImageFromScreenshot(stream, img_path, bbox=None):
+def searchImageFromScreenshot(img_path, bbox=None):
     """
     returns me the coordinates of the the centre of the found image
 
@@ -62,10 +62,13 @@ def searchImageFromScreenshot(stream, img_path, bbox=None):
     """
     print(bbox)
     print("insdie searchImageFromScreenshot")
-    threshold = 0.51
+    threshold = 0.85
     template = cv2.imread(img_path,0)
 
-    im_color = stream.read() # im_color = stream.read(bbox)  bbox 100x100
+    # img_org = stream.read() # im_color = stream.read(bbox)  bbox 100x100
+    auto.screenshot("saved_snips_for_cliks/img_screenshot.png")
+    img_org = cv2.imread("saved_snips_for_cliks/img_screenshot.png")
+    im_color = img_org
     screenshot_h,screenshot_w,_ = im_color.shape
 
     if bbox is not None:
@@ -79,10 +82,11 @@ def searchImageFromScreenshot(stream, img_path, bbox=None):
 
     res = cv2.matchTemplate(im,template,cv2.TM_CCOEFF_NORMED)
     print(np.max(res))
+
+    RESULT_FOUND_FLAG = False
+    loc = np.where(res == np.max(res))
     if np.max(res)>threshold:
-        loc = np.where(res == np.max(res))
-    else:
-        return None,None
+        RESULT_FOUND_FLAG = True
 
     for pt in zip(*loc[::-1]):
         point = pt
@@ -91,8 +95,6 @@ def searchImageFromScreenshot(stream, img_path, bbox=None):
     x = point[0]+w/2
     y = point[1]+h/2
 
-
-
     print("debug 1 : ", (x,y))
     if bbox is not None:
         print("adding offset")
@@ -100,15 +102,15 @@ def searchImageFromScreenshot(stream, img_path, bbox=None):
         x += x1
         y += y1
 
-    img_debug = stream.read()
+    img_debug = img_org
     cv2.rectangle(img_debug, (int(x),int(y)), (int(x + w), int(y + h)), (0,0,255), 2)
     cv2.imwrite("saved_snips_for_cliks/img_debug.jpg",img_debug)
-    print("debug 2 : ", (x,y))
+
+    if RESULT_FOUND_FLAG == False:
+        return None,None
 
     x = int(x*mouse_screen_w/screenshot_w)
     y = int(y*mouse_screen_h/screenshot_h)
-
-    print("# DEBUG: x,y,mouse_screen_w,screenshot_w: ", x,y,mouse_screen_w,screenshot_w)
     return x,y
 
 
@@ -289,7 +291,7 @@ def get_bbox_around_pixel(w,h,half_length=50):
     #     wright = screenshot_w
     return [wleft,heightup,wright,heightdown]
 
-def searchImageFromScreenshotForNSeconds(stream,img_path,x,y,N) :
+def searchImageFromScreenshotForNSeconds(img_path,x,y,N) :
     """
     """
     time_start = time.time()
@@ -300,7 +302,7 @@ def searchImageFromScreenshotForNSeconds(stream,img_path,x,y,N) :
         if(time.time()-time_start>N):
             break
         bbox = get_bbox_around_pixel(x,y,half_length=100)
-        x_output,y_output = searchImageFromScreenshot(stream,img_path,bbox)
+        x_output,y_output = searchImageFromScreenshot(img_path,bbox)
         if x_output is None and y_output is None:
             continue
         else:
@@ -314,14 +316,15 @@ def searchImageFromScreenshotForNSeconds(stream,img_path,x,y,N) :
         count+=1
         if(time.time()-time_start>N):
             break
-        x_output,y_output = searchImageFromScreenshot(stream,img_path)
+        x_output,y_output = searchImageFromScreenshot(img_path)
         if x_output is None and y_output is None:
             continue
         else:
             print(x_output,y_output)
             return x_output,y_output
 
-    CustomException("Error: Image: " + img_path + " not found")
+    print("Error: Image: " + img_path + " not found")
+    CustomException("Error: Image: " + " not found")
 
 def searchAppNameForNSeconds(row_active_software_name, row_active_window_name, row_active_window_bbox,x,y, N):
     print("inside searchAppNameForNSeconds")
@@ -344,3 +347,26 @@ def searchAppNameForNSeconds(row_active_software_name, row_active_window_name, r
             print("rescaled: ", (X,Y))
             return X,Y
     CustomException("Error: actual: " + str(row_active_software_name) + " but getting " + str(active_software_name) )
+
+
+def add_windoInfo_and_save_image_from_timer_csv():
+    windowInfo_timePreviousSec = 0.05
+    commands_csv_file = "saved_snips_for_cliks/commands.csv"
+    window_info_file = "saved_snips_for_cliks/WindowInfo.csv"
+    df_info = pd.read_csv(window_info_file)
+    df_commands = pd.read_csv(commands_csv_file)
+    info_list = np.array([ [row.time, (row.active_software_name,row.active_window_name,row.active_window_bbox)]  for index, row in df_info.iterrows()])
+    arr_active_software_name,arr_active_window_bbox,arr_active_window_name = [],[],[]
+    for index, row in df_commands.iterrows():
+        print(index)
+        t,info = info_list[ info_list[:,0]< row.time-windowInfo_timePreviousSec][-1]
+        active_software_name, active_window_name, active_window_bbox = info
+        arr_active_software_name.append(active_software_name)
+        arr_active_window_name.append(active_window_name)
+        arr_active_window_bbox.append(active_window_bbox)
+
+    # df_commands["img_path"] = arr_img_path
+    df_commands["active_software_name"] = arr_active_software_name
+    df_commands["active_window_name"] = arr_active_window_name
+    df_commands["active_window_bbox"] = arr_active_window_bbox
+    df_commands.to_csv("saved_snips_for_cliks/combined_commands.csv")
