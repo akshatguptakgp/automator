@@ -71,16 +71,31 @@ def main():
             print(type(eval(row.active_window_bbox)))
 
             button_name = row.button.split('.')[1]
+
+
+
             if row.pressed == "pressed":
                 file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
-                # file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
                 file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds("{}",x=x, y=y, N={}) \n""".format("saved_snips_for_cliks/" + str(row.time).split(".")[0] + "_" + str(row.time).split(".")[1][:3] + ".png", waitForImageTime))
 
+                if (index+1!=df.shape[0])  and (df.iloc[index+1].button=="moveTo"):
+                    file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
+                    continue
+
                 file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
+                file1.write("""    auto.click(clicks=1) \n""")
                 file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,duration))
 
             elif row.pressed == "released":
+                if (index-1!=0)  and (df.iloc[index-1].button=="moveTo"):
+                    file1.write("""    auto.dragTo( x={}, y={},button='left') \n""".format(row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT))
+                    continue
+
                 file1.write("""    auto.mouseUp(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,duration))
+            
+            
+
+
             else:
                 raise utils.CustomException("recordingButton has undefined text")
 
@@ -100,11 +115,13 @@ def main():
 
             file1.write("""    mouse.scroll(dx={}, dy={}) \n""".format(dx,dy))
 
-        elif row.button=="moveTo":
-            file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,0.01))#duration
+        # elif row.button=="moveTo":
+            # auto.moveTo( x=57.43359375, y=116.6015625,duration=0.01) 
+            # file1.write("""    auto.dragTo( x={}, y={},button='left') \n""".format(row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT))
+            # file1.write("""    auto.moveTo( x={}, y={},duration={}) \n""".format(row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,0.01))#duration
 
     #keyboard commands
-        else:
+        elif row.pressed in ["down","up"]:
             if row.pressed == "down":
                 file1.write("""    keyboard.press("{}") \n""".format(row.button))
             elif row.pressed == "up":

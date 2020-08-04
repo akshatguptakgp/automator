@@ -8,7 +8,6 @@ Created on Sun Jun  7 23:13:46 2020
 import pyautogui as auto
 from pynput import mouse
 from pynput import keyboard
-import mouse as mp
 import time
 import pandas as pd
 import cv2
@@ -32,6 +31,7 @@ def catch_exception(f):
         try:
             return f(self,*args, **kwargs)
         except Exception as e:
+            print("error")
             print(" *********************************************************************")
             self.stop_event_recording(exceptionFlag=True)
             print('Caught an exception in', f.__name__)
@@ -127,11 +127,11 @@ class EventRecord():
 
     def stop_event_recording(self,exceptionFlag=False):
         self.video_getter.stop()
-        # print("stopped screen_recorder")
+        print("stopped screen_recorder")
 
         while self.frameExtractorDfIndexSeen != self.df.shape[0]-1:
             time.sleep(0.1)
-
+        print("line 133")
         self.frameExtractorStopped = True
 
         self.window_getter.stop()
@@ -169,12 +169,14 @@ class EventRecord():
 
     @catch_exception
     def on_move(self, x, y):
-        currentTime = time.time()
-        x = x/self.SCREEN_WIDTH
-        y = y/self.SCREEN_HEIGHT
+        
 
-        if self.LEFT_KEY_PRESSED_FLAG:
-            self.df = self.df.append({"button": "moveTo", "x": x, "y": y, "time": currentTime, "pressed": "None"}, ignore_index=True)
+        if not (self.df.shape[0] >= 1 and self.df.iloc[self.df.shape[0]-1].button=="moveTo"):
+            if self.LEFT_KEY_PRESSED_FLAG:
+                currentTime = time.time()
+                x = x/self.SCREEN_WIDTH
+                y = y/self.SCREEN_HEIGHT
+                self.df = self.df.append({"button": "moveTo", "x": x, "y": y, "time": currentTime, "pressed": "None"}, ignore_index=True)
 
     @catch_exception
     def on_click(self, x, y, button, pressed):
