@@ -27,6 +27,7 @@ def main():
     file1.write("        print('Ending program in between') \n")
     # file1.write("        raise SystemExit(0) \n")
     file1.write("        os._exit(0) \n")
+
     file1.write("    keyboard.add_hotkey('Esc+q', endProgram,suppress=True) \n")
     file1.write("    mouse = Controller() \n")
     # print("-------- .py file --------")
@@ -34,6 +35,7 @@ def main():
     waitForImageTime = 2
     waitForAppNameTime = 5
     index_to_skip = []
+    prev_hold_time = None
     for index, row in df.iterrows():
         if index in index_to_skip:
             continue
@@ -51,18 +53,19 @@ def main():
         if row.button == "Button.left" or row.button == "Button.right":
             if index+3<df.shape[0]:
                 if not df.iloc[index+1].isnull().x and not df.iloc[index+2].isnull().x and not df.iloc[index+3].isnull().x:
-                    if df.iloc[index].x==df.iloc[index+1].x==df.iloc[index+2].x==df.iloc[index+3].x and df.iloc[index].y==df.iloc[index+1].y==df.iloc[index+2].y==df.iloc[index+3].y:
-                        # file1.write("""    time.sleep(1) \n""")
-                        file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
-                        file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds("{}",x=x, y=y, N={}) \n""".format("saved_snips_for_cliks/" + str(row.time).split(".")[0] + "_" + str(row.time).split(".")[1][:3] + ".png", waitForImageTime))
-                        file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(2))
-                        file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format('left',0.1))
-                        file1.write("""    auto.mouseUp(button='{}', x=x, y=y, duration = {}) \n""".format('left',0.1))
-                        file1.write("""    auto.click(clicks=2) \n""")
-                        index_to_skip.append(index+1)
-                        index_to_skip.append(index+2)
-                        index_to_skip.append(index+3)
-                        continue
+                    if df.iloc[index+1].button == df.iloc[index+2].button == df.iloc[index+3].button == "Button.left":
+                        if df.iloc[index].x==df.iloc[index+1].x==df.iloc[index+2].x==df.iloc[index+3].x and df.iloc[index].y==df.iloc[index+1].y==df.iloc[index+2].y==df.iloc[index+3].y:
+                            # file1.write("""    time.sleep(1) \n""")
+                            file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
+                            file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds("{}",x=x, y=y, N={}) \n""".format("saved_snips_for_cliks/" + str(row.time).split(".")[0] + "_" + str(row.time).split(".")[1][:3] + ".png", waitForImageTime))
+                            file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(2))
+                            file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format('left',0.1))
+                            file1.write("""    auto.mouseUp(button='{}', x=x, y=y, duration = {}) \n""".format('left',0.1))
+                            file1.write("""    auto.click(clicks=2) \n""")
+                            index_to_skip.append(index+1)
+                            index_to_skip.append(index+2)
+                            index_to_skip.append(index+3)
+                            continue
 
     #move to actual coordinates
         if row.button == "Button.left" or row.button == "Button.right":
@@ -72,30 +75,22 @@ def main():
 
             button_name = row.button.split('.')[1]
 
-
-
             if row.pressed == "pressed":
                 file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
                 file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds("{}",x=x, y=y, N={}) \n""".format("saved_snips_for_cliks/" + str(row.time).split(".")[0] + "_" + str(row.time).split(".")[1][:3] + ".png", waitForImageTime))
+                file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
 
                 if (index+1!=df.shape[0])  and (df.iloc[index+1].button=="moveTo"):
-                    file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
+                    file1.write("""    auto.click(clicks=1) \n""")
                     continue
-
-                file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
+                # file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,0.1)) # duration
                 file1.write("""    auto.click(clicks=1) \n""")
-                file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,duration))
 
             elif row.pressed == "released":
                 if (index-1!=0)  and (df.iloc[index-1].button=="moveTo"):
-                    file1.write("""    auto.dragTo( x={}, y={},button='left') \n""".format(row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT))
+                    # file1.write("""    auto.dragTo( x={}, y={},button='left') \n""".format(row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT))
                     continue
-
-                file1.write("""    auto.mouseUp(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,duration))
-            
-            
-
-
+                # file1.write("""    auto.mouseUp(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,0.1))
             else:
                 raise utils.CustomException("recordingButton has undefined text")
 
@@ -105,15 +100,29 @@ def main():
             dx = 0
             dy = 0
             if row.button=="hscroll":
-                dx = row.pressed
+                dx = int(eval(row.pressed))
             if row.button=="vscroll":
-                dy = row.pressed
+                dy = 5*int(eval(row.pressed))
 
             if (index-1==0) or (df.iloc[index-1].button!="hscroll" and df.iloc[index-1].button!="vscroll"):
                 file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
                 file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
 
-            file1.write("""    mouse.scroll(dx={}, dy={}) \n""".format(dx,dy))
+            if dx!=0:
+                for _ in range(abs(dx)):
+                    if dx > 0:
+                        sign = 1
+                    else:
+                        sign = -1
+                    file1.write("""    mouse.scroll(dx={}, dy={}) \n""".format(sign,0))
+            print(dy,type(dy))
+            if dy!=0:
+                for _ in range(abs(dy)):
+                    if dy > 0:
+                        sign = 1
+                    else:
+                        sign = -1
+                    file1.write("""    mouse.scroll(dx={}, dy={}) \n""".format(0,sign))
 
         # elif row.button=="moveTo":
             # auto.moveTo( x=57.43359375, y=116.6015625,duration=0.01) 
@@ -122,11 +131,22 @@ def main():
 
     #keyboard commands
         elif row.pressed in ["down","up"]:
+            file1.write("""    auto.sleep({}) \n""".format(0.5))
             if row.pressed == "down":
+                if row.button in ["down","up","right","left"] and index-1>=0 and df.iloc[index-1].button==row.button:
+                    continue
+
                 file1.write("""    keyboard.press("{}") \n""".format(row.button))
+                # file1.write("""    auto.keyDown("{}") \n""".format(row.button))
+                prev_hold_time = row.time
+
             elif row.pressed == "up":
-                file1.write("""    keyboard.release("{}") \n""".format(row.button))
-            file1.write("""    auto.sleep({}) \n""".format(threshold))
+                if (row.button in ["down","up","right","left"]) and (prev_hold_time is not None):
+                    file1.write("""    utils.hold_key("{}",{}) \n""".format(row.button,row.time - prev_hold_time))
+                else:
+                    file1.write("""    keyboard.release("{}") \n""".format(row.button))
+                    # file1.write("""    auto.keyUp("{}") \n""".format(row.button))
+                
 
         if (index!=df.shape[0]-1) and (not df.iloc[index+1].isnull().x) and (not df.iloc[index+1].isnull().y) and row.button!="moveTo":
             if (df.iloc[index+1].button=="vscroll" and df.iloc[index].button=="vscroll") or (df.iloc[index+1].button=="hscroll" and df.iloc[index].button=="hscroll"):

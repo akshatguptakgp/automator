@@ -194,12 +194,11 @@ class EventRecord():
         self.df = self.df.append({"button": str(button), "x": x, "y": y, "time": currentTime, "pressed": 'pressed' if pressed else 'released'}, ignore_index=True)
         return
 
-    @catch_exception
+    # @catch_exception
     def on_scroll(self,x, y, dx, dy):
         currentTime = time.time()
         x = x/self.SCREEN_WIDTH
         y = y/self.SCREEN_HEIGHT
-
         if dy!=0:
             self.df = self.df.append({"button": "vscroll", "x": x, "y": y, "time": currentTime, "pressed": dy}, ignore_index=True)
         if dx!=0:

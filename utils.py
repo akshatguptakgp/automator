@@ -10,6 +10,7 @@ import pyautogui as auto
 import pynput
 import pandas as pd
 from pynput.mouse import Button, Controller
+import keyboard
 import os, shutil
 if sys.platform in ['Windows', 'win32', 'cygwin']:
     import wmi
@@ -27,6 +28,16 @@ def setupLogger(parser):
     log.setLevel(level)
     return log
 
+def hold_key(key, hold_time):
+        start = time.time()
+        while time.time()-start < hold_time: 
+            # auto.press(key)
+            # auto.keyDown(key)
+            # keyboard.press(key)
+            # keyboard.release(key)
+            keyboard.press_and_release(key)
+            time.sleep(0.1)
+            
 def deleteAllFilesInsideFolder(folder):
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)
