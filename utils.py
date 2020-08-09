@@ -1,16 +1,11 @@
-from vidgear.gears import ScreenGear
 import pyttsx3
 import time
 import sys
 import logging
-from PIL import ImageGrab
 import cv2
 import numpy as np
 import pyautogui as auto
-import pynput
 import pandas as pd
-from pynput.mouse import Button, Controller
-import keyboard
 import os, shutil
 if sys.platform in ['Windows', 'win32', 'cygwin']:
     import wmi
@@ -73,7 +68,7 @@ def searchImageFromScreenshot(img_path, bbox=None):
     """
     print(bbox)
     print("insdie searchImageFromScreenshot")
-    threshold = 0.7 #change this!!
+    threshold = 0.80 #change this!!
     template = cv2.imread(img_path,0)
 
     # img_org = stream.read() # im_color = stream.read(bbox)  bbox 100x100
@@ -96,7 +91,7 @@ def searchImageFromScreenshot(img_path, bbox=None):
 
     RESULT_FOUND_FLAG = False
     loc = np.where(res == np.max(res))
-    if np.max(res)>threshold:
+    if (np.max(res)>threshold) or (np.max(res)==0.0):
         RESULT_FOUND_FLAG = True
 
     for pt in zip(*loc[::-1]):

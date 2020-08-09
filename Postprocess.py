@@ -1,9 +1,6 @@
 import pandas as pd
-import utils
 import numpy as np
-import sys
 from utils import *
-import math
 
 def add_windoInfo_and_save_image_from_timer_csv():
     windowInfo_timePreviousSec = 0.05

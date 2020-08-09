@@ -1,7 +1,5 @@
 from threading import Thread
 import time
-import numpy as np
-from queue import Queue
 import utils
 import pandas as pd
 

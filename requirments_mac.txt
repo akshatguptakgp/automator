@@ -4,11 +4,10 @@ PyQt5
 pyautogui
 pynput
 vidgear
-keyboard
+keyboard==0.13.2
 pyttsx3
 pandas
 opencv-python
 pillow
 numpy
 logging
-

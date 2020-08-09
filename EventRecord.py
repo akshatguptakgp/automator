@@ -7,23 +7,16 @@ Created on Sun Jun  7 23:13:46 2020
 """
 import pyautogui as auto
 from pynput import mouse
-from pynput import keyboard
 import time
 import pandas as pd
-import cv2
-import os
-import keyboard
 import utils
+import keyboard
 from WindowInfoGetter import WindowInfoGetter
-from ScreenRecorder import ScreenRecorder
-import sys
 import numpy as np
 import functools
-import copy
-import asyncio
 from threading import Thread
 from ScreenGrab import VideoGet
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 
 def catch_exception(f):
     @functools.wraps(f)

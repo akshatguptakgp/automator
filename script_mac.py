@@ -1,11 +1,6 @@
 import pandas as pd
-import cv2
-import numpy as np
-import time
 import pyautogui as auto
 import utils
-import ast
-
 def main():
     ## every line corresponds to a command ##
     df = pd.read_csv('saved_snips_for_cliks/combined_commands.csv')
@@ -73,27 +68,28 @@ def main():
             print(eval(row.active_window_bbox))
             print(type(eval(row.active_window_bbox)))
 
-            button_name = row.button.split('.')[1]
-
-            if row.pressed == "pressed":
-                file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
+            button_name = row.button.split('.')[1]            
+            if row.pressed == "pressed":            
+                file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))   
                 file1.write("""    x,y = utils.searchImageFromScreenshotForNSeconds("{}",x=x, y=y, N={}) \n""".format("saved_snips_for_cliks/" + str(row.time).split(".")[0] + "_" + str(row.time).split(".")[1][:3] + ".png", waitForImageTime))
                 file1.write("""    auto.moveTo( x=x, y=y,duration={}) \n""".format(5))
 
-                if (index+1!=df.shape[0])  and (df.iloc[index+1].button=="moveTo"):
-                    file1.write("""    auto.click(clicks=1) \n""")
-                    continue
-                # file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,0.1)) # duration
-                file1.write("""    auto.click(clicks=1) \n""")
+                # if (index+1!=df.shape[0])  and (df.iloc[index+1].button=="moveTo"):
+                #     file1.write("""    auto.click(clicks=1) \n""")
+                #     continue
 
+                # file1.write("""    auto.mouseDown(button='{}', x=x, y=y, duration = {}) \n""".format(button_name,0.1)) # duration
+                file1.write("""    auto.click(clicks=1,button='{}') \n""".format(button_name))
+            
             elif row.pressed == "released":
                 if (index-1!=0)  and (df.iloc[index-1].button=="moveTo"):
+                    file1.write("""    x,y = utils.searchAppNameForNSeconds("{}","{}",{},{},{},{}) \n""".format(row.active_software_name,row.active_window_name,row.active_window_bbox,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,waitForAppNameTime))
+                    file1.write("""    auto.dragTo( x=x, y=y,button='left') \n""")
                     # file1.write("""    auto.dragTo( x={}, y={},button='left') \n""".format(row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT))
                     continue
                 # file1.write("""    auto.mouseUp(button='{}', x={}, y={}, duration = {}) \n""".format(button_name,row.x*SCREEN_WIDTH,row.y*SCREEN_HEIGHT,0.1))
             else:
                 raise utils.CustomException("recordingButton has undefined text")
-
 
     #scroll commands
         elif row.button=="hscroll" or row.button=="vscroll":

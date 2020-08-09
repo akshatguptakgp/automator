@@ -12,12 +12,8 @@ import os
 import sys
 import argparse
 import utils
-import cv2
-import pynput
 from EventRecord import EventRecord
-import script
 import importlib
-import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-log", "--log", default="info",help=("Provide logging level. "    "Example --log debug', default='warning'"),)
@@ -54,11 +50,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
   def runButtonPressed(self):
     log.debug("runButtonPressed clicked")
+
+    if sys.platform in ['Windows', 'win32', 'cygwin']:
+      import script_windows as script
+    elif sys.platform in ['Mac', 'darwin', 'os2', 'os2emx']:
+      import script_mac as script
+
     script.main() # creating script_csv.py fille
     import script_csv
     importlib.reload(script_csv)
     script_csv.main() #calling script_csv fille
-
 
 if __name__ == '__main__':
   app = QtWidgets.QApplication(sys.argv)
